@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coop Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #ff6900;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .coop-logo {
+            width: 80px;
+            height: 40px;
+            background: white;
+            border-radius: 6px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #ff6900;
+            font-size: 24px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .chat-container {
+            padding: 40px;
+            min-height: 400px;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .assistant-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6900, #e55a00);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 105, 0, 0.3);
+        }
+
+        .welcome-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .input-container {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 30px 40px;
+            border-top: 1px solid #e9ecef;
+            z-index: 1001;
+        }
+
+        .chat-input-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 18px 60px 18px 20px;
+            font-size: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            resize: none;
+            font-family: inherit;
+        }
+
+        .chat-input:focus {
+            border-color: #ff6900;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.1);
+        }
+
+        .send-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ff6900;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            background: #e55a00;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: translateY(-50%) scale(1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff6900;
+            border-radius: 50%;
+            animation: typingPulse 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingPulse {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+
+        .results-container {
+            padding: 20px 40px 0;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .result-item:hover {
+            background: white;
+            border-color: #ff6900;
+            box-shadow: 0 4px 15px rgba(255, 105, 0, 0.1);
+        }
+
+        .result-header {
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .result-content {
+            flex: 1;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .result-summary {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .workflow-btn {
+            background: #ff6900;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .workflow-btn:hover {
+            background: #e55a00;
+            transform: scale(1.05);
+        }
+
+        .result-details {
+            padding: 25px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: none;
+        }
+
+        .result-details.expanded {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .detail-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .steps-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .steps-list ol {
+            margin-left: 20px;
+        }
+
+        .steps-list li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 40px;
+            color: #666;
+        }
+
+        .no-results-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .suggestion-chip {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            color: #666;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-chip:hover {
+            border-color: #ff6900;
+            color: #ff6900;
+            background: rgba(255, 105, 0, 0.05);
+        }
+
+        .live-suggestions {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            margin-bottom: 2px;
+        }
+
+        .live-suggestions.show {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f3f4;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .suggestion-item:first-child {
+            border-top: none;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 105, 0, 0.05);
+            border-left: 3px solid #ff6900;
+        }
+
+        .suggestion-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 105, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .suggestion-content {
+            flex: 1;
+        }
+
+        .suggestion-title {
+            font-weight: 500;
+            color: #333;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .suggestion-preview {
+            color: #666;
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .suggestion-match {
+            background: rgba(255, 105, 0, 0.2);
+            padding: 1px 3px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 12px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .chat-container {
+                padding: 30px 20px;
+            }
+
+            .input-container {
+                padding: 20px;
+            }
+
+            .results-container {
+                padding: 10px 20px 0;
+            }
+
+            .result-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .workflow-btn {
+                align-self: flex-start;
+                margin-top: 15px;
+            }
+
+            .suggestion-chips {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="coop-logo">coop</div>
+            <h1>Digitaler Assistent</h1>
+            <p>Wie kann ich Ihnen heute helfen?</p>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="assistant-avatar">🤖</div>
+                <h2 class="welcome-title">Hallo! Ich bin Ihr Coop Assistent</h2>
+                <p class="welcome-subtitle">Stellen Sie mir eine Frage oder beschreiben Sie Ihr Problem. Ich helfe Ihnen gerne weiter und finde die passenden Lösungen für Sie.</p>
+                
+                <div class="suggestion-chips">
+                    <div class="suggestion-chip" onclick="quickSearch('Login Probleme')">Login Probleme</div>
+                    <div class="suggestion-chip" onclick="quickSearch('E-Mail einrichten')">E-Mail einrichten</div>
+                    <div class="suggestion-chip" onclick="quickSearch('VPN Verbindung')">VPN Verbindung</div>
+                    <div class="suggestion-chip" onclick="quickSearch('Passwort zurücksetzen')">Passwort zurücksetzen</div>
+                </div>
+            </div>
+
+            <div id="loadingContainer" class="loading" style="display: none;">
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                <p>Ich suche nach Lösungen für Sie...</p>
+            </div>
+
+            <div class="results-container" id="resultsContainer" style="display: none;">
+                <!-- Ergebnisse werden hier eingefügt -->
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="chat-input-wrapper">
+                <textarea class="chat-input" id="chatInput" placeholder="Beschreiben Sie Ihr Problem oder stellen Sie eine Frage..." rows="1"></textarea>
+                <button class="send-btn" id="sendBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                    </svg>
+                </button>
+                <div class="live-suggestions" id="liveSuggestions">
+                    <!-- Live-Vorschläge werden hier eingefügt -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock API Daten für Demonstration
+        const mockApiData = [
+            {
+                id: 1,
+                title: "Probleme beim Login beheben",
+                summary: "Häufige Probleme beim Anmeldeprozess und deren Lösungsansätze. Includes password reset procedures and account lockout resolution.",
+                content: "Wenn Sie sich nicht anmelden können, gibt es verschiedene Lösungsansätze. Zunächst sollten Sie überprüfen, ob Ihre Anmeldedaten korrekt sind. Falls Sie Ihr Passwort vergessen haben, können Sie es über den 'Passwort vergessen' Link zurücksetzen.",
+                steps: [
+                    "Überprüfung der Anmeldedaten auf Tippfehler",
+                    "Caps Lock und Tastaturlayout kontrollieren",
+                    "Passwort über 'Passwort vergessen' zurücksetzen",
+                    "Browser-Cache und Cookies löschen",
+                    "Bei weiterhin Problemen IT-Support kontaktieren"
+                ],
+                workflowUrl: "https://workflow.coop.ch/login-issues",
+                lastUpdated: "2024-12-15"
+            },
+            {
+                id: 2,
+                title: "E-Mail-Konfiguration für Outlook",
+                summary: "Schritt-für-Schritt Anleitung zur Einrichtung von E-Mail-Konten in Microsoft Outlook mit verschiedenen Protokollen.",
+                content: "Die Einrichtung Ihres Coop E-Mail-Kontos in Outlook ist einfach. Folgen Sie dieser Anleitung für eine erfolgreiche Konfiguration mit den korrekten Servereinstellungen.",
+                steps: [
+                    "Outlook öffnen und 'Datei' > 'Konto hinzufügen' wählen",
+                    "E-Mail-Adresse eingeben und automatische Konfiguration versuchen",
+                    "Bei Fehlschlag manuelle Einrichtung mit IMAP-Einstellungen",
+                    "Servereinstellungen: IMAP server.coop.ch Port 993 (SSL)",
+                    "SMTP server.coop.ch Port 587 (STARTTLS)",
+                    "Verbindung testen und E-Mail-Synchronisation prüfen"
+                ],
+                workflowUrl: "https://workflow.coop.ch/email-setup",
+                lastUpdated: "2024-12-10"
+            },
+            {
+                id: 3,
+                title: "VPN-Verbindung einrichten",
+                summary: "Anleitung zur Einrichtung einer sicheren VPN-Verbindung für Remote-Arbeit und sicheren Zugriff auf Unternehmensressourcen.",
+                content: "Für den sicheren Zugriff auf das Coop-Netzwerk von zu Hause aus benötigen Sie eine VPN-Verbindung. Diese Anleitung führt Sie durch den gesamten Einrichtungsprozess.",
+                steps: [
+                    "Coop VPN-Client von der IT-Seite herunterladen",
+                    "Installation mit Administratorrechten durchführen",
+                    "Verbindungsprofil mit bereitgestellten Zugangsdaten importieren",
+                    "Erste Verbindung herstellen und Zertifikat bestätigen",
+                    "Verbindungsstabilität testen und bei Problemen IT kontaktieren"
+                ],
+                workflowUrl: "https://workflow.coop.ch/vpn-setup",
+                lastUpdated: "2024-12-08"
+            }
+        ];
+
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const liveSuggestions = document.getElementById('liveSuggestions');
+
+        let searchTimeout;
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            
+            // Live-Suche mit Debounce
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length >= 2) {
+                searchTimeout = setTimeout(() => {
+                    showLiveSuggestions(query);
+                }, 300);
+            } else {
+                hideLiveSuggestions();
+            }
+        });
+
+        // Klick außerhalb versteckt Vorschläge
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.chat-input-wrapper')) {
+                hideLiveSuggestions();
+            }
+        });
+
+        // Focus zeigt Vorschläge wieder an (falls vorhanden)
+        chatInput.addEventListener('focus', function() {
+            const query = this.value.trim();
+            if (query.length >= 2) {
+                showLiveSuggestions(query);
+            }
+        });
+
+        // Event Listeners
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+
+        sendBtn.addEventListener('click', performSearch);
+
+        // Quick search von Suggestion Chips
+        function quickSearch(query) {
+            chatInput.value = query;
+            performSearch();
+        }
+
+        // Suche durchführen
+        function performSearch() {
+            const query = chatInput.value.trim();
+            if (!query) return;
+
+            hideWelcomeScreen();
+            showLoading();
+            
+            // Simuliere API-Aufruf mit Delay
+            setTimeout(() => {
+                const results = mockApiCall(query);
+                displayResults(results, query);
+                hideLoading();
+            }, 1200);
+        }
+
+        // Welcome Screen verstecken
+        function hideWelcomeScreen() {
+            welcomeScreen.style.display = 'none';
+        }
+
+        // Mock API-Aufruf
+        function mockApiCall(query) {
+            const lowercaseQuery = query.toLowerCase();
+            return mockApiData.filter(item => 
+                item.title.toLowerCase().includes(lowercaseQuery) ||
+                item.summary.toLowerCase().includes(lowercaseQuery) ||
+                item.content.toLowerCase().includes(lowercaseQuery)
+            );
+        }
+
+        // Loading-Zustand anzeigen
+        function showLoading() {
+            loadingContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            sendBtn.disabled = true;
+        }
+
+        // Loading-Zustand verstecken
+        function hideLoading() {
+            loadingContainer.style.display = 'none';
+            sendBtn.disabled = false;
+        }
+
+        // Ergebnisse anzeigen
+        function displayResults(results, query) {
+            resultsContainer.style.display = 'block';
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🤔</div>
+                        <h3>Keine passenden Lösungen gefunden</h3>
+                        <p>Ich konnte zu "${query}" keine Hilfestellungen finden. Versuchen Sie es mit anderen Begriffen oder kontaktieren Sie direkt den Support.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsContainer.innerHTML = `
+                <div style="margin-bottom: 30px; padding: 20px; background: rgba(255, 105, 0, 0.05); border-radius: 12px; border-left: 4px solid #ff6900;">
+                    <p style="color: #666; margin: 0;"><strong>Ich habe ${results.length} ${results.length === 1 ? 'Lösung' : 'Lösungen'} für "${query}" gefunden:</strong></p>
+                </div>
+                ${results.map(item => `
+                    <div class="result-item" onclick="toggleDetails(${item.id})">
+                        <div class="result-header">
+                            <div class="result-content">
+                                <h3 class="result-title">${item.title}</h3>
+                                <p class="result-summary">${item.summary}</p>
+                            </div>
+                            <button class="workflow-btn" onclick="startWorkflow('${item.workflowUrl}', event)">
+                                Problem lösen
+                            </button>
+                        </div>
+                        <div class="result-details" id="details-${item.id}">
+                            <div class="detail-content">${item.content}</div>
+                            <div class="steps-list">
+                                <strong>Lösungsschritte:</strong>
+                                <ol>
+                                    ${item.steps.map(step => `<li>${step}</li>`).join('')}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // Details ein-/ausklappen
+        function toggleDetails(itemId) {
+            const details = document.getElementById(`details-${itemId}`);
+            details.classList.toggle('expanded');
+        }
+
+        // Workflow starten
+        function startWorkflow(url, event) {
+            event.stopPropagation();
+            if (confirm('Möchten Sie den Workflow zur Lösung dieses Problems starten?')) {
+                window.open(url, '_blank');
+            }
+        }
+
+        // Live-Vorschläge anzeigen
+        function showLiveSuggestions(query) {
+            const results = mockApiCall(query);
+            
+            if (results.length === 0) {
+                hideLiveSuggestions();
+                return;
+            }
+
+            const suggestions = results.slice(0, 4).map(item => {
+                const title = highlightMatch(item.title, query);
+                const preview = truncateText(item.summary, 80);
+                
+                return `
+                    <div class="suggestion-item" onclick="selectSuggestion('${item.title}', ${item.id})">
+                        <div class="suggestion-icon">💡</div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-title">${title}</div>
+                            <div class="suggestion-preview">${preview}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            liveSuggestions.innerHTML = suggestions;
+            liveSuggestions.classList.add('show');
+        }
+
+        // Live-Vorschläge verstecken
+        function hideLiveSuggestions() {
+            liveSuggestions.classList.remove('show');
+        }
+
+        // Vorschlag auswählen
+        function selectSuggestion(title, itemId) {
+            chatInput.value = title;
+            hideLiveSuggestions();
+            performSearch();
+        }
+
+        // Text highlighten
+        function highlightMatch(text, query) {
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="suggestion-match">$1</span>');
+        }
+
+        // Text kürzen
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substr(0, maxLength) + '...';
+        }
+    </script>
+</body>
+</html>

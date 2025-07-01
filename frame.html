@@ -14,7 +14,9 @@
         body {
             font-family: 'Helvetica', Arial, sans-serif;
             background: #f8f9fa;
-            min-height: 100vh;
+            /* Entferne das Padding, um den Container direkt an den Bildschirmrändern zu platzieren */
+            /* min-height: 100vh;  */
+            height: 100vh; /* Setze die Höhe auf 100% der Viewport-Höhe */
             padding: 20px;
         }
 
@@ -23,9 +25,12 @@
             margin: 0 auto;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            /* Entferne den Schatten, da der Container nun den gesamten Bildschirm ausfüllt */
+            /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); */
             overflow: hidden;
+            height: 100%; /* Setze die Höhe des Containers auf 100% */
         }
+
 
         .header {
             background: #ff6900;
@@ -461,16 +466,11 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="coop-logo">coop</div>
-            <h1>Digitaler Assistent</h1>
-            <p>Wie kann ich Ihnen heute helfen?</p>
-        </div>
+
 
         <div class="chat-container" id="chatContainer">
             <div class="welcome-screen" id="welcomeScreen">
-                <div class="assistant-avatar">🤖</div>
-                <h2 class="welcome-title">Hallo! Ich bin Ihr Coop Assistent</h2>
+                <h2 class="welcome-title">Coop Self Service</h2>
                 <p class="welcome-subtitle">Stellen Sie mir eine Frage oder beschreiben Sie Ihr Problem. Ich helfe Ihnen gerne weiter und finde die passenden Lösungen für Sie.</p>
                 
                 <div class="suggestion-chips">

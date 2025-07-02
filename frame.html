@@ -17,18 +17,19 @@
             /* Entferne das Padding, um den Container direkt an den Bildschirmrändern zu platzieren */
             /* min-height: 100vh;  */
             height: 100vh; /* Setze die Höhe auf 100% der Viewport-Höhe */
-            padding: 20px;
         }
 
         .container {
-            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
             /* Entferne den Schatten, da der Container nun den gesamten Bildschirm ausfüllt */
             /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); */
             overflow: hidden;
-            height: 100%; /* Setze die Höhe des Containers auf 100% */
         }
 
 
@@ -67,13 +68,15 @@
         }
 
         .chat-container {
-            padding: 40px;
+            padding: 20px 40px;
             min-height: 400px;
+            flex: 1;
+            overflow-y: auto;
         }
 
         .welcome-screen {
             text-align: center;
-            padding: 60px 20px;
+            padding: 20px 20px;
         }
 
         .assistant-avatar {
@@ -108,7 +111,7 @@
             position: sticky;
             bottom: 0;
             background: white;
-            padding: 30px 40px;
+            padding: 20px 40px;
             border-top: 1px solid #e9ecef;
             z-index: 1001;
         }
@@ -130,6 +133,14 @@
             background: #f8f9fa;
             resize: none;
             font-family: inherit;
+            overflow: hidden; /* Scrollbar entfernen */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
+        }
+
+        /* Webkit-basierte Browser (Chrome, Safari, Edge) */
+        .chat-input::-webkit-scrollbar {
+            display: none;
         }
 
         .chat-input:focus {
@@ -198,6 +209,7 @@
 
         .results-container {
             padding: 20px 40px 0;
+            overflow-y: auto;
         }
 
         .result-item {
@@ -344,14 +356,14 @@
 
         .live-suggestions {
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 0;
             right: 0;
             background: white;
             border: 1px solid #e9ecef;
             border-bottom: none;
-            border-radius: 12px 12px 0 0;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             z-index: 1000;
             max-height: 300px;
             overflow-y: auto;
@@ -436,7 +448,7 @@
             }
 
             .chat-container {
-                padding: 30px 20px;
+                padding: 20px 20px;
             }
 
             .input-container {
@@ -462,17 +474,97 @@
                 align-items: center;
             }
         }
-    </style>
+    
+/* --- MARKENSPEZIFISCHE STYLES --- */
+
+/* Result Card Hover */
+.result-item.jumbo:hover {
+    border-color: #004f9f;
+    box-shadow: 0 4px 15px rgba(0, 79, 159, 0.1);
+}
+.result-item.interdiscount:hover {
+    border-color: #f41d1a;
+    box-shadow: 0 4px 15px rgba(244, 29, 26, 0.1);
+}
+.result-item.livique:hover {
+    border-color: #262626;
+    box-shadow: 0 4px 15px rgba(38, 38, 38, 0.1);
+}
+
+/* Workflow Button */
+.workflow-btn.jumbo {
+    background: #004f9f;
+}
+.workflow-btn.jumbo:hover {
+    background: #003a75;
+}
+
+.workflow-btn.interdiscount {
+    background: #f41d1a;
+}
+.workflow-btn.interdiscount:hover {
+    background: #c71613;
+}
+
+.workflow-btn.livique {
+    background: #262626;
+}
+.workflow-btn.livique:hover {
+    background: #1a1a1a;
+}
+
+
+/* Markenspezifische Live Suggestions */
+.suggestion-item.jumbo:hover {
+    background: rgba(0, 79, 159, 0.05);
+    border-left: 3px solid #004f9f;
+}
+.suggestion-item.interdiscount:hover {
+    background: rgba(244, 29, 26, 0.05);
+    border-left: 3px solid #f41d1a;
+}
+.suggestion-item.livique:hover {
+    background: rgba(38, 38, 38, 0.05);
+    border-left: 3px solid #262626;
+}
+
+
+.result-icon {
+    font-size: 1.3rem;
+    margin-right: 8px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+</style>
 </head>
 <body>
     <div class="container">
-
+        
+            <div class="welcome-screen" id="welcomeScreen">
+                <h2 class="welcome-title">Coop FAQ</h2>
+                <p class="welcome-subtitle">Stellen Sie mir eine Frage oder beschreiben Sie Ihr Problem. Ich helfe Ihnen gerne weiter und finde die passenden Lösungen für Sie.</p>
+            </div>
+        
+        <div class="input-container">
+            <div class="chat-input-wrapper">
+                <textarea class="chat-input" id="chatInput" placeholder="Beschreiben Sie Ihr Problem oder stellen Sie eine Frage..." rows="1"></textarea>
+                <button class="send-btn" id="sendBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                    </svg>
+                </button>
+                <div class="live-suggestions" id="liveSuggestions">
+                    <!-- Live-Vorschläge werden hier eingefügt -->
+                </div>
+            </div>
+        </div>
 
         <div class="chat-container" id="chatContainer">
             <div class="welcome-screen" id="welcomeScreen">
-                <h2 class="welcome-title">Coop Self Service</h2>
-                <p class="welcome-subtitle">Stellen Sie mir eine Frage oder beschreiben Sie Ihr Problem. Ich helfe Ihnen gerne weiter und finde die passenden Lösungen für Sie.</p>
                 
+        
                 <div class="suggestion-chips">
                     <div class="suggestion-chip" onclick="quickSearch('Login Probleme')">Login Probleme</div>
                     <div class="suggestion-chip" onclick="quickSearch('E-Mail einrichten')">E-Mail einrichten</div>
@@ -495,20 +587,7 @@
             </div>
         </div>
 
-        <div class="input-container">
-            <div class="chat-input-wrapper">
-                <textarea class="chat-input" id="chatInput" placeholder="Beschreiben Sie Ihr Problem oder stellen Sie eine Frage..." rows="1"></textarea>
-                <button class="send-btn" id="sendBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22,2 15,22 11,13 2,9"></polygon>
-                    </svg>
-                </button>
-                <div class="live-suggestions" id="liveSuggestions">
-                    <!-- Live-Vorschläge werden hier eingefügt -->
-                </div>
-            </div>
-        </div>
+
     </div>
 
     <script>
@@ -562,6 +641,8 @@
             }
         ];
 
+        const API_URL = 'https://demo1990745.mockable.io/query';
+        const API_KEY = 'c1f8765d-981a-4c82-941b-002245282f30';
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
         const loadingContainer = document.getElementById('loadingContainer');
@@ -621,19 +702,18 @@
         }
 
         // Suche durchführen
-        function performSearch() {
+        async function performSearch() {
             const query = chatInput.value.trim();
             if (!query) return;
 
             hideWelcomeScreen();
             showLoading();
             
-            // Simuliere API-Aufruf mit Delay
-            setTimeout(() => {
-                const results = mockApiCall(query);
-                displayResults(results, query);
-                hideLoading();
-            }, 1200);
+            const results = await mockApiCall(query);
+            console.log(results);
+            displayResults(results, query);
+            hideLoading();
+
         }
 
         // Welcome Screen verstecken
@@ -642,13 +722,22 @@
         }
 
         // Mock API-Aufruf
-        function mockApiCall(query) {
+        async function mockApiCall(query) {
             const lowercaseQuery = query.toLowerCase();
-            return mockApiData.filter(item => 
+            const response = await fetch(API_URL, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const data = await response.json();
+
+            //const data =  mockApiData;
+            return data.filter(item => 
                 item.title.toLowerCase().includes(lowercaseQuery) ||
                 item.summary.toLowerCase().includes(lowercaseQuery) ||
-                item.content.toLowerCase().includes(lowercaseQuery)
-            );
+                item.content.toLowerCase().includes(lowercaseQuery) ||
+                item.tags.some( tag => tag.toLowerCase().includes(lowercaseQuery)));
         }
 
         // Loading-Zustand anzeigen
@@ -665,48 +754,43 @@
         }
 
         // Ergebnisse anzeigen
-        function displayResults(results, query) {
-            resultsContainer.style.display = 'block';
-            
-            if (results.length === 0) {
-                resultsContainer.innerHTML = `
-                    <div class="no-results">
-                        <div class="no-results-icon">🤔</div>
-                        <h3>Keine passenden Lösungen gefunden</h3>
-                        <p>Ich konnte zu "${query}" keine Hilfestellungen finden. Versuchen Sie es mit anderen Begriffen oder kontaktieren Sie direkt den Support.</p>
-                    </div>
-                `;
-                return;
-            }
+        
+function displayResults(results, query) {
+    resultsContainer.style.display = 'block';
 
-            resultsContainer.innerHTML = `
-                <div style="margin-bottom: 30px; padding: 20px; background: rgba(255, 105, 0, 0.05); border-radius: 12px; border-left: 4px solid #ff6900;">
-                    <p style="color: #666; margin: 0;"><strong>Ich habe ${results.length} ${results.length === 1 ? 'Lösung' : 'Lösungen'} für "${query}" gefunden:</strong></p>
-                </div>
-                ${results.map(item => `
-                    <div class="result-item" onclick="toggleDetails(${item.id})">
-                        <div class="result-header">
-                            <div class="result-content">
-                                <h3 class="result-title">${item.title}</h3>
-                                <p class="result-summary">${item.summary}</p>
-                            </div>
-                            <button class="workflow-btn" onclick="startWorkflow('${item.workflowUrl}', event)">
-                                Problem lösen
-                            </button>
+    if (results.length === 0) {
+        resultsContainer.innerHTML = `
+            <div class="no-results">
+                <div class="no-results-icon">🤔</div>
+                <h3>Keine passenden Lösungen gefunden</h3>
+                <p>Ich konnte zu "${query}" keine Hilfestellungen finden. Versuchen Sie es mit anderen Begriffen oder kontaktieren Sie direkt den Support.</p>
+            </div>
+        `;
+        return;
+    }
+
+    resultsContainer.innerHTML = `
+        ${results.map(item => {
+            const brandClass = item.brand?.toLowerCase() || 'coop';
+            return `
+                <div class="result-item ${brandClass}" onclick="toggleDetails(${item.id})">
+                    <div class="result-header">
+                        <div class="result-content">
+                            <div class="result-icon">${item.icon || "💡"}</div> <h3 class="result-title">${item.title}</h3>
+                            <p class="result-summary">${item.summary}</p>
                         </div>
-                        <div class="result-details" id="details-${item.id}">
-                            <div class="detail-content">${item.content}</div>
-                            <div class="steps-list">
-                                <strong>Lösungsschritte:</strong>
-                                <ol>
-                                    ${item.steps.map(step => `<li>${step}</li>`).join('')}
-                                </ol>
-                            </div>
-                        </div>
+                        <button class="workflow-btn ${brandClass}" onclick="startWorkflow('${item.workflowUrl}', event)">
+                            Problem lösen
+                        </button>
                     </div>
-                `).join('')}
+                    <div class="result-details" id="details-${item.id}">
+                        <div class="detail-content">${item.content}</div>
+                    </div>
+                </div>
             `;
-        }
+        }).join('')}
+    `;
+}
 
         // Details ein-/ausklappen
         function toggleDetails(itemId) {
@@ -716,15 +800,13 @@
 
         // Workflow starten
         function startWorkflow(url, event) {
+            window.open(url, '_blank');
             event.stopPropagation();
-            if (confirm('Möchten Sie den Workflow zur Lösung dieses Problems starten?')) {
-                window.open(url, '_blank');
-            }
         }
 
         // Live-Vorschläge anzeigen
-        function showLiveSuggestions(query) {
-            const results = mockApiCall(query);
+        async function showLiveSuggestions(query) {
+            const results = await mockApiCall(query);
             
             if (results.length === 0) {
                 hideLiveSuggestions();
@@ -732,12 +814,13 @@
             }
 
             const suggestions = results.slice(0, 4).map(item => {
-                const title = highlightMatch(item.title, query);
+            const brandClass = item.brand?.toLowerCase() || 'coop';
+            const title = highlightMatch(item.title, query);
                 const preview = truncateText(item.summary, 80);
                 
                 return `
-                    <div class="suggestion-item" onclick="selectSuggestion('${item.title}', ${item.id})">
-                        <div class="suggestion-icon">💡</div>
+                    <div class="suggestion-item ${brandClass}" onclick="selectSuggestion('${item.title}', ${item.id})">
+                        <div class="suggestion-icon">${item.icon || "💡"}</div>
                         <div class="suggestion-content">
                             <div class="suggestion-title">${title}</div>
                             <div class="suggestion-preview">${preview}</div>

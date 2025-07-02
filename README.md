@@ -1,8 +1,4 @@
-# faq-bot
-
-Coop Case
-
-
+## FAQ Bot
 - Eigene Eintität mit allen Wissenbeiträgen
     - Aus JSON von Thomas importieren und Marke als Attribut
     - Marke (Jumbo, Interdiscount) als Attribut
@@ -20,9 +16,20 @@ Coop Case
     - Quittungen suchen:
         - Eingabe in Suche nach meinen Quittungen
         - Automatischer Absprung zu den Bestellungen mit der Möglichkeit die Quittung herunterzuladen
+    - Möglichkeit Supercard neu zu bestellen:
+        - Eingabe und direkt Workflow starten
 
+## Rückruf vereinbaren mittels OTV
+- Suche nach Problem findet keine Lösung -> Rückruf vereinbaren
+- Automatische Zuweisung an freien Kundendienstmitarbeiter
 
-Rückruf vereinbaren mittels OTV
+## Dashboard
+- Startansicht mit Infos zu aktuellm Superpunkte Stand, Offene Cases und Bestellungen
+- Verwalten von eigenen Daten:
+    - Preference Center
+    - Kontaktdaten
+- Möglichkeit Supercard neu zu bestellen
+
 
 
 

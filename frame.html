@@ -206,6 +206,8 @@
 
         .results-container {
             padding: 20px 40px 0;
+            max-height: 50vh;
+            overflow-y: auto;
         }
 
         .result-item {
@@ -470,7 +472,69 @@
                 align-items: center;
             }
         }
-    </style>
+    
+/* --- MARKENSPEZIFISCHE STYLES --- */
+
+/* Result Card Hover */
+.result-item.jumbo:hover {
+    border-color: #004f9f;
+    box-shadow: 0 4px 15px rgba(0, 79, 159, 0.1);
+}
+.result-item.interdiscount:hover {
+    border-color: #f41d1a;
+    box-shadow: 0 4px 15px rgba(244, 29, 26, 0.1);
+}
+.result-item.livique:hover {
+    border-color: #262626;
+    box-shadow: 0 4px 15px rgba(38, 38, 38, 0.1);
+}
+
+/* Workflow Button */
+.workflow-btn.jumbo {
+    background: #004f9f;
+}
+.workflow-btn.jumbo:hover {
+    background: #003a75;
+}
+
+.workflow-btn.interdiscount {
+    background: #f41d1a;
+}
+.workflow-btn.interdiscount:hover {
+    background: #c71613;
+}
+
+.workflow-btn.livique {
+    background: #262626;
+}
+.workflow-btn.livique:hover {
+    background: #1a1a1a;
+}
+
+
+/* Markenspezifische Live Suggestions */
+.suggestion-item.jumbo:hover {
+    background: rgba(0, 79, 159, 0.05);
+    border-left: 3px solid #004f9f;
+}
+.suggestion-item.interdiscount:hover {
+    background: rgba(244, 29, 26, 0.05);
+    border-left: 3px solid #f41d1a;
+}
+.suggestion-item.livique:hover {
+    background: rgba(38, 38, 38, 0.05);
+    border-left: 3px solid #262626;
+}
+
+
+.result-icon {
+    font-size: 1.3rem;
+    margin-right: 8px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+</style>
 </head>
 <body>
     <div class="container">
@@ -688,42 +752,43 @@
         }
 
         // Ergebnisse anzeigen
-        function displayResults(results, query) {
-            resultsContainer.style.display = 'block';
-            
-            if (results.length === 0) {
-                resultsContainer.innerHTML = `
-                    <div class="no-results">
-                        <div class="no-results-icon">🤔</div>
-                        <h3>Keine passenden Lösungen gefunden</h3>
-                        <p>Ich konnte zu "${query}" keine Hilfestellungen finden. Versuchen Sie es mit anderen Begriffen oder kontaktieren Sie direkt den Support.</p>
-                    </div>
-                `;
-                return;
-            }
+        
+function displayResults(results, query) {
+    resultsContainer.style.display = 'block';
 
-            resultsContainer.innerHTML = `
-                <div style="margin-bottom: 30px; padding: 20px; background: rgba(255, 105, 0, 0.05); border-radius: 12px; border-left: 4px solid #ff6900;">
-                    <p style="color: #666; margin: 0;"><strong>Ich habe ${results.length} ${results.length === 1 ? 'Lösung' : 'Lösungen'} für "${query}" gefunden:</strong></p>
-                </div>
-                ${results.map(item => `
-                    <div class="result-item" onclick="toggleDetails(${item.id})">
-                        <div class="result-header">
-                            <div class="result-content">
-                                <h3 class="result-title">${item.title}</h3>
-                                <p class="result-summary">${item.summary}</p>
-                            </div>
-                            <button class="workflow-btn" onclick="startWorkflow('${item.workflowUrl}', event)">
-                                Problem lösen
-                            </button>
+    if (results.length === 0) {
+        resultsContainer.innerHTML = `
+            <div class="no-results">
+                <div class="no-results-icon">🤔</div>
+                <h3>Keine passenden Lösungen gefunden</h3>
+                <p>Ich konnte zu "${query}" keine Hilfestellungen finden. Versuchen Sie es mit anderen Begriffen oder kontaktieren Sie direkt den Support.</p>
+            </div>
+        `;
+        return;
+    }
+
+    resultsContainer.innerHTML = `
+        ${results.map(item => {
+            const brandClass = item.brand?.toLowerCase() || 'coop';
+            return `
+                <div class="result-item ${brandClass}" onclick="toggleDetails(${item.id})">
+                    <div class="result-header">
+                        <div class="result-content">
+                            <div class="result-icon">${item.icon || "💡"}</div> <h3 class="result-title">${item.title}</h3>
+                            <p class="result-summary">${item.summary}</p>
                         </div>
-                        <div class="result-details" id="details-${item.id}">
-                            <div class="detail-content">${item.content}</div>
-                        </div>
+                        <button class="workflow-btn ${brandClass}" onclick="startWorkflow('${item.workflowUrl}', event)">
+                            Problem lösen
+                        </button>
                     </div>
-                `).join('')}
+                    <div class="result-details" id="details-${item.id}">
+                        <div class="detail-content">${item.content}</div>
+                    </div>
+                </div>
             `;
-        }
+        }).join('')}
+    `;
+}
 
         // Details ein-/ausklappen
         function toggleDetails(itemId) {
@@ -747,12 +812,13 @@
             }
 
             const suggestions = results.slice(0, 4).map(item => {
-                const title = highlightMatch(item.title, query);
+            const brandClass = item.brand?.toLowerCase() || 'coop';
+            const title = highlightMatch(item.title, query);
                 const preview = truncateText(item.summary, 80);
                 
                 return `
-                    <div class="suggestion-item" onclick="selectSuggestion('${item.title}', ${item.id})">
-                        <div class="suggestion-icon">💡</div>
+                    <div class="suggestion-item ${brandClass}" onclick="selectSuggestion('${item.title}', ${item.id})">
+                        <div class="suggestion-icon">${item.icon || "💡"}</div>
                         <div class="suggestion-content">
                             <div class="suggestion-title">${title}</div>
                             <div class="suggestion-preview">${preview}</div>

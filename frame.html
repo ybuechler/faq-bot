@@ -67,13 +67,13 @@
         }
 
         .chat-container {
-            padding: 40px;
+            padding: 20px 40px;
             min-height: 400px;
         }
 
         .welcome-screen {
             text-align: center;
-            padding: 60px 20px;
+            padding: 20px 20px;
         }
 
         .assistant-avatar {
@@ -108,7 +108,7 @@
             position: sticky;
             bottom: 0;
             background: white;
-            padding: 30px 40px;
+            padding: 20px 40px;
             border-top: 1px solid #e9ecef;
             z-index: 1001;
         }
@@ -130,6 +130,14 @@
             background: #f8f9fa;
             resize: none;
             font-family: inherit;
+            overflow: hidden; /* Scrollbar entfernen */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
+        }
+
+        /* Webkit-basierte Browser (Chrome, Safari, Edge) */
+        .chat-input::-webkit-scrollbar {
+            display: none;
         }
 
         .chat-input:focus {
@@ -344,14 +352,14 @@
 
         .live-suggestions {
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 0;
             right: 0;
             background: white;
             border: 1px solid #e9ecef;
             border-bottom: none;
-            border-radius: 12px 12px 0 0;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             z-index: 1000;
             max-height: 300px;
             overflow-y: auto;
@@ -436,7 +444,7 @@
             }
 
             .chat-container {
-                padding: 30px 20px;
+                padding: 20px 20px;
             }
 
             .input-container {
@@ -466,13 +474,31 @@
 </head>
 <body>
     <div class="container">
-
-
-        <div class="chat-container" id="chatContainer">
+        
             <div class="welcome-screen" id="welcomeScreen">
                 <h2 class="welcome-title">Coop Self Service</h2>
                 <p class="welcome-subtitle">Stellen Sie mir eine Frage oder beschreiben Sie Ihr Problem. Ich helfe Ihnen gerne weiter und finde die passenden Lösungen für Sie.</p>
+            </div>
+        
+        <div class="input-container">
+            <div class="chat-input-wrapper">
+                <textarea class="chat-input" id="chatInput" placeholder="Beschreiben Sie Ihr Problem oder stellen Sie eine Frage..." rows="1"></textarea>
+                <button class="send-btn" id="sendBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                    </svg>
+                </button>
+                <div class="live-suggestions" id="liveSuggestions">
+                    <!-- Live-Vorschläge werden hier eingefügt -->
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-screen" id="welcomeScreen">
                 
+        
                 <div class="suggestion-chips">
                     <div class="suggestion-chip" onclick="quickSearch('Login Probleme')">Login Probleme</div>
                     <div class="suggestion-chip" onclick="quickSearch('E-Mail einrichten')">E-Mail einrichten</div>
@@ -495,20 +521,7 @@
             </div>
         </div>
 
-        <div class="input-container">
-            <div class="chat-input-wrapper">
-                <textarea class="chat-input" id="chatInput" placeholder="Beschreiben Sie Ihr Problem oder stellen Sie eine Frage..." rows="1"></textarea>
-                <button class="send-btn" id="sendBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22,2 15,22 11,13 2,9"></polygon>
-                    </svg>
-                </button>
-                <div class="live-suggestions" id="liveSuggestions">
-                    <!-- Live-Vorschläge werden hier eingefügt -->
-                </div>
-            </div>
-        </div>
+
     </div>
 
     <script>
@@ -562,6 +575,8 @@
             }
         ];
 
+        const API_URL = 'https://demo1990745.mockable.io/query';
+        const API_KEY = 'c1f8765d-981a-4c82-941b-002245282f30';
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
         const loadingContainer = document.getElementById('loadingContainer');
@@ -621,19 +636,18 @@
         }
 
         // Suche durchführen
-        function performSearch() {
+        async function performSearch() {
             const query = chatInput.value.trim();
             if (!query) return;
 
             hideWelcomeScreen();
             showLoading();
             
-            // Simuliere API-Aufruf mit Delay
-            setTimeout(() => {
-                const results = mockApiCall(query);
-                displayResults(results, query);
-                hideLoading();
-            }, 1200);
+            const results = await mockApiCall(query);
+            console.log(results);
+            displayResults(results, query);
+            hideLoading();
+
         }
 
         // Welcome Screen verstecken
@@ -642,13 +656,22 @@
         }
 
         // Mock API-Aufruf
-        function mockApiCall(query) {
+        async function mockApiCall(query) {
             const lowercaseQuery = query.toLowerCase();
-            return mockApiData.filter(item => 
+            const response = await fetch(API_URL, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const data = await response.json();
+
+            //const data =  mockApiData;
+            return data.filter(item => 
                 item.title.toLowerCase().includes(lowercaseQuery) ||
                 item.summary.toLowerCase().includes(lowercaseQuery) ||
-                item.content.toLowerCase().includes(lowercaseQuery)
-            );
+                item.content.toLowerCase().includes(lowercaseQuery) ||
+                item.tags.some( tag => tag.toLowerCase().includes(lowercaseQuery)));
         }
 
         // Loading-Zustand anzeigen
@@ -696,12 +719,6 @@
                         </div>
                         <div class="result-details" id="details-${item.id}">
                             <div class="detail-content">${item.content}</div>
-                            <div class="steps-list">
-                                <strong>Lösungsschritte:</strong>
-                                <ol>
-                                    ${item.steps.map(step => `<li>${step}</li>`).join('')}
-                                </ol>
-                            </div>
                         </div>
                     </div>
                 `).join('')}
@@ -716,15 +733,13 @@
 
         // Workflow starten
         function startWorkflow(url, event) {
+            window.open(url, '_blank');
             event.stopPropagation();
-            if (confirm('Möchten Sie den Workflow zur Lösung dieses Problems starten?')) {
-                window.open(url, '_blank');
-            }
         }
 
         // Live-Vorschläge anzeigen
-        function showLiveSuggestions(query) {
-            const results = mockApiCall(query);
+        async function showLiveSuggestions(query) {
+            const results = await mockApiCall(query);
             
             if (results.length === 0) {
                 hideLiveSuggestions();

@@ -17,18 +17,19 @@
             /* Entferne das Padding, um den Container direkt an den Bildschirmrändern zu platzieren */
             /* min-height: 100vh;  */
             height: 100vh; /* Setze die Höhe auf 100% der Viewport-Höhe */
-            padding: 20px;
         }
 
         .container {
-            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
             /* Entferne den Schatten, da der Container nun den gesamten Bildschirm ausfüllt */
             /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); */
             overflow: hidden;
-            height: 100%; /* Setze die Höhe des Containers auf 100% */
         }
 
 
@@ -69,6 +70,8 @@
         .chat-container {
             padding: 20px 40px;
             min-height: 400px;
+            flex: 1;
+            overflow-y: auto;
         }
 
         .welcome-screen {
@@ -206,7 +209,6 @@
 
         .results-container {
             padding: 20px 40px 0;
-            max-height: 50vh;
             overflow-y: auto;
         }
 
@@ -540,7 +542,7 @@
     <div class="container">
         
             <div class="welcome-screen" id="welcomeScreen">
-                <h2 class="welcome-title">Coop Self Service</h2>
+                <h2 class="welcome-title">Coop FAQ</h2>
                 <p class="welcome-subtitle">Stellen Sie mir eine Frage oder beschreiben Sie Ihr Problem. Ich helfe Ihnen gerne weiter und finde die passenden Lösungen für Sie.</p>
             </div>
         

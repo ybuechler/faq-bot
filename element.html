@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markenswitcher Modern</title>
+  <style>
+
+
+    .brand-switcher {
+      position: relative;
+      display: inline-block;
+    }
+
+    .main-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      width: 200px;
+      height: 60px;
+    }
+
+    .main-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand-fan {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) scaleY(0);
+      transform-origin: top;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+    }
+
+    .brand-switcher:hover .brand-fan,
+    .brand-switcher.open .brand-fan {
+      transform: translateX(-50%) scaleY(1);
+    }
+
+    .brand-fan button {
+      background: none;
+      border: none;
+      width: 200px;
+      height: 60px;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+
+
+    .brand-fan button img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: #ddd;
+      margin: 5px 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="brand-switcher">
+    <button class="main-btn">
+      <img src="https://www.coop.ch/etc/designs/seitenrahmen/images/format-logos-svg/logo-coop.svg" alt="Coop">
+    </button>
+    <div class="brand-fan">
+      <button data-url="https://fooby.ch">
+        <img src="https://fooby.ch/etc/designs/fooby/frontend/default/assets/images/logo-header-desktop.svg" alt="Fooby">
+      </button>
+      <div class="divider"></div>
+      <button data-url="https://www.jumbo.ch">
+        <img src="https://www.jumbo.ch/_ui/25.16.0.633/desktop/common/images/logo/logo-jumbo.svg" alt="Jumbo">
+      </button>
+      <div class="divider"></div>
+      <button data-url="https://www.livique.ch">
+        <img src="https://www.livique.ch/_ui/25.7.0.446/lilu/common/img/livique-logo.svg" alt="Livique">
+      </button>
+    </div>
+  </div>
+
+  <script>
+    document.querySelector('.main-btn').addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelector('.brand-switcher').classList.toggle('open');
+    });
+
+    document.querySelectorAll('.brand-fan button').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const url = this.dataset.url;
+        window.location.href = url;
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      const switcher = document.querySelector('.brand-switcher');
+      if (!switcher.contains(e.target)) {
+        switcher.classList.remove('open');
+      }
+    });
+  </script>
+
+</body>
+</html>

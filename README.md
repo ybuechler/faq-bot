@@ -29,6 +29,7 @@
     - Preference Center
     - Kontaktdaten
 - Möglichkeit Supercard neu zu bestellen
+- Datenschutzexport starten
 
 
 

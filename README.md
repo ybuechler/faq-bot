@@ -25,7 +25,7 @@
 
 ## Dashboard
 - Startansicht mit Infos zu aktuellm Superpunkte Stand, Offene Cases und Bestellungen
-- Verwalten von eigenen Daten:
+- Verwalten von eigenen Daten:123456
     - Preference Center
     - Kontaktdaten
 - Möglichkeit Supercard neu zu bestellen

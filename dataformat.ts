@@ -11,4 +11,7 @@ export type Wissensbeitrag = {
     tags: string[],
     active: boolean,
 }
-            
+ 
+
+
+

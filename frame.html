@@ -528,6 +528,48 @@
     display: inline-block;
     vertical-align: middle;
   }
+
+  /* iOS-Toggle Switch */
+  .brain-toggle {
+    position: absolute;
+    right: -60px; /* rechts neben dem Senden-Button */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 28px;
+    background: #ccc;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    padding: 3px;
+  }
+
+  .brain-toggle.active {
+    background: #ff6900; /* orange wenn aktiv */
+  }
+
+  .brain-toggle-thumb {
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  .brain-toggle.active .brain-toggle-thumb {
+    transform: translateX(22px);
+  }
+
+  .brain-toggle-thumb span {
+    color: #ff6900; /* Icon Farbe */
+  }
 </style>
 
 <div class="coop-container">
@@ -560,6 +602,14 @@
           <polygon points="22,2 15,22 11,13 2,9"></polygon>
         </svg>
       </button>
+
+      <!-- 🧠 iOS-Style Brain Toggle -->
+      <div class="brain-toggle" id="brainToggle" title="AI ein/aus">
+        <div class="brain-toggle-thumb">
+          <span>🧠</span>
+        </div>
+      </div>
+
       <div class="live-suggestions" id="liveSuggestions">
         <!-- Live-Vorschläge werden hier eingefügt -->
       </div>
@@ -597,63 +647,6 @@
 
 <script>
   // Mock API Daten für Demonstration
-  const mockApiData = [
-    {
-      id: 1,
-      title: "Probleme beim Login beheben",
-      summary:
-        "Häufige Probleme beim Anmeldeprozess und deren Lösungsansätze. Includes password reset procedures and account lockout resolution.",
-      content:
-        "Wenn Sie sich nicht anmelden können, gibt es verschiedene Lösungsansätze. Zunächst sollten Sie überprüfen, ob Ihre Anmeldedaten korrekt sind. Falls Sie Ihr Passwort vergessen haben, können Sie es über den 'Passwort vergessen' Link zurücksetzen.",
-      steps: [
-        "Überprüfung der Anmeldedaten auf Tippfehler",
-        "Caps Lock und Tastaturlayout kontrollieren",
-        "Passwort über 'Passwort vergessen' zurücksetzen",
-        "Browser-Cache und Cookies löschen",
-        "Bei weiterhin Problemen IT-Support kontaktieren",
-      ],
-      workflowUrl: "https://workflow.coop.ch/login-issues",
-      lastUpdated: "2024-12-15",
-      tags: "Test, Blob, Blub",
-    },
-    {
-      id: 2,
-      title: "E-Mail-Konfiguration für Outlook",
-      summary:
-        "Schritt-für-Schritt Anleitung zur Einrichtung von E-Mail-Konten in Microsoft Outlook mit verschiedenen Protokollen.",
-      content:
-        "Die Einrichtung Ihres Coop E-Mail-Kontos in Outlook ist einfach. Folgen Sie dieser Anleitung für eine erfolgreiche Konfiguration mit den korrekten Servereinstellungen.",
-      steps: [
-        "Outlook öffnen und 'Datei' > 'Konto hinzufügen' wählen",
-        "E-Mail-Adresse eingeben und automatische Konfiguration versuchen",
-        "Bei Fehlschlag manuelle Einrichtung mit IMAP-Einstellungen",
-        "Servereinstellungen: IMAP server.coop.ch Port 993 (SSL)",
-        "SMTP server.coop.ch Port 587 (STARTTLS)",
-        "Verbindung testen und E-Mail-Synchronisation prüfen",
-      ],
-      workflowUrl: "https://workflow.coop.ch/email-setup",
-      lastUpdated: "2024-12-10",
-      tags: "Test, Blob, Blub",
-    },
-    {
-      id: 3,
-      title: "VPN-Verbindung einrichten",
-      summary:
-        "Anleitung zur Einrichtung einer sicheren VPN-Verbindung für Remote-Arbeit und sicheren Zugriff auf Unternehmensressourcen.",
-      content:
-        "Für den sicheren Zugriff auf das Coop-Netzwerk von zu Hause aus benötigen Sie eine VPN-Verbindung. Diese Anleitung führt Sie durch den gesamten Einrichtungsprozess.",
-      steps: [
-        "Coop VPN-Client von der IT-Seite herunterladen",
-        "Installation mit Administratorrechten durchführen",
-        "Verbindungsprofil mit bereitgestellten Zugangsdaten importieren",
-        "Erste Verbindung herstellen und Zertifikat bestätigen",
-        "Verbindungsstabilität testen und bei Problemen IT kontaktieren",
-      ],
-      workflowUrl: "https://workflow.coop.ch/vpn-setup",
-      lastUpdated: "2024-12-08",
-      tags: "Test, Blob, Blub",
-    },
-  ];
 
   const API_URL =
     "https://bsi-2004.trials.bsi-software.com/bsiinterfaces/web-api/17e67ab8-1d28-488e-bed2-77c8d809fc30/knowhow/query";
@@ -666,6 +659,17 @@
   const liveSuggestions = document.getElementById("liveSuggestions");
 
   let searchTimeout;
+
+  // State für AI-Parameter
+  let aiEnabled = false;
+  const brainToggle = document.getElementById("brainToggle");
+
+  // Brain Toggle Logik
+  brainToggle.addEventListener("click", function () {
+    aiEnabled = !aiEnabled;
+    brainToggle.classList.toggle("active", aiEnabled);
+    console.log("AI Mode:", aiEnabled ? "ON" : "OFF");
+  });
 
   // Auto-resize textarea
   chatInput.addEventListener("input", function () {
@@ -737,8 +741,12 @@
   async function mockApiCall(query) {
     const lowercaseQuery = query.toLowerCase();
 
+    const aiParam = aiEnabled ? "&ai=true" : "&ai=false";
+    const fullUrl =
+      API_URL + `?query=${encodeURIComponent(lowercaseQuery)}${aiParam}`;
+
     try {
-      const response = await fetch(API_URL + `?query=${lowercaseQuery}`, {
+      const response = await fetch(fullUrl, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -746,16 +754,8 @@
       });
 
       const data = await response.json();
-
-      return data.filter(
-        (item) =>
-          item.title.toLowerCase().includes(lowercaseQuery) ||
-          item.summary.toLowerCase().includes(lowercaseQuery) ||
-          item.content.toLowerCase().includes(lowercaseQuery) ||
-          item.tags
-            .split(",")
-            .some((tag) => tag.toLowerCase().includes(lowercaseQuery))
-      );
+      console.log("API call successful:", data);
+      return data;
     } catch (error) {
       console.warn("API call failed, using mock data instead:", error);
 
@@ -806,6 +806,32 @@
       return;
     }
 
+    if (results.length === 1) {
+      const item = results[0];
+      const brandClass = item.brand?.toLowerCase() || "coop";
+
+      resultsContainer.innerHTML = `
+      <div class="result-item ${brandClass}">
+        <div class="result-header">
+          <div class="result-content">
+            <div class="result-icon">${item.icon || "💡"}</div>
+            <h3 class="result-title">${item.title}</h3>
+            <p class="result-summary">${item.summary}</p>
+          </div>
+          <button class="workflow-btn ${brandClass}" onclick="startWorkflow('${
+        item.workflowUrl
+      }', event)">
+            Problem lösen
+          </button>
+        </div>
+        <div class="result-details expanded" id="details-${item.id}">
+          <div class="detail-content">${item.content}</div>
+        </div>
+      </div>
+    `;
+      return;
+    }
+
     resultsContainer.innerHTML = `
         ${results
           .map((item) => {
@@ -821,9 +847,7 @@
                             }</div> <h3 class="result-title">${item.title}</h3>
                             <p class="result-summary">${item.summary}</p>
                         </div>
-                        <button class="workflow-btn ${brandClass}" onclick="startWorkflow('${
-              item.workflowUrl
-            }', event)">
+                        <button class="workflow-btn ${brandClass}" onclick="startWorkflow('${item.workflowUrl}', event)">
                             Problem lösen
                         </button>
                     </div>
@@ -845,12 +869,17 @@
 
   // Workflow starten
   function startWorkflow(url, event) {
-    window.open(url, "_blank");
+    window.open(url + '?customerNo=1000001601', "_blank");
     event.stopPropagation();
   }
 
   // Live-Vorschläge anzeigen
   async function showLiveSuggestions(query) {
+    if (aiEnabled) {
+      // Wenn AI an ist, keine Vorschläge laden
+      hideLiveSuggestions();
+      return;
+    }
     const results = await mockApiCall(query);
 
     if (results.length === 0) {
@@ -906,4 +935,62 @@
     if (text.length <= maxLength) return text;
     return text.substr(0, maxLength) + "...";
   }
+
+  const mockApiData = [
+    {
+      id: 1,
+      title: "Probleme beim Login beheben",
+      summary:
+        "Häufige Probleme beim Anmeldeprozess und deren Lösungsansätze. Includes password reset procedures and account lockout resolution.",
+      content:
+        "Wenn Sie sich nicht anmelden können, gibt es verschiedene Lösungsansätze. Zunächst sollten Sie überprüfen, ob Ihre Anmeldedaten korrekt sind. Falls Sie Ihr Passwort vergessen haben, können Sie es über den 'Passwort vergessen' Link zurücksetzen.",
+      steps: [
+        "Überprüfung der Anmeldedaten auf Tippfehler",
+        "Caps Lock und Tastaturlayout kontrollieren",
+        "Passwort über 'Passwort vergessen' zurücksetzen",
+        "Browser-Cache und Cookies löschen",
+        "Bei weiterhin Problemen IT-Support kontaktieren",
+      ],
+      workflowUrl: "https://workflow.coop.ch/login-issues",
+      lastUpdated: "2024-12-15",
+      tags: "Test, Blob, Blub",
+    },
+    {
+      id: 2,
+      title: "E-Mail-Konfiguration für Outlook",
+      summary:
+        "Schritt-für-Schritt Anleitung zur Einrichtung von E-Mail-Konten in Microsoft Outlook mit verschiedenen Protokollen.",
+      content:
+        "Die Einrichtung Ihres Coop E-Mail-Kontos in Outlook ist einfach. Folgen Sie dieser Anleitung für eine erfolgreiche Konfiguration mit den korrekten Servereinstellungen.",
+      steps: [
+        "Outlook öffnen und 'Datei' > 'Konto hinzufügen' wählen",
+        "E-Mail-Adresse eingeben und automatische Konfiguration versuchen",
+        "Bei Fehlschlag manuelle Einrichtung mit IMAP-Einstellungen",
+        "Servereinstellungen: IMAP server.coop.ch Port 993 (SSL)",
+        "SMTP server.coop.ch Port 587 (STARTTLS)",
+        "Verbindung testen und E-Mail-Synchronisation prüfen",
+      ],
+      workflowUrl: "https://workflow.coop.ch/email-setup",
+      lastUpdated: "2024-12-10",
+      tags: "Test, Blob, Blub",
+    },
+    {
+      id: 3,
+      title: "VPN-Verbindung einrichten",
+      summary:
+        "Anleitung zur Einrichtung einer sicheren VPN-Verbindung für Remote-Arbeit und sicheren Zugriff auf Unternehmensressourcen.",
+      content:
+        "Für den sicheren Zugriff auf das Coop-Netzwerk von zu Hause aus benötigen Sie eine VPN-Verbindung. Diese Anleitung führt Sie durch den gesamten Einrichtungsprozess.",
+      steps: [
+        "Coop VPN-Client von der IT-Seite herunterladen",
+        "Installation mit Administratorrechten durchführen",
+        "Verbindungsprofil mit bereitgestellten Zugangsdaten importieren",
+        "Erste Verbindung herstellen und Zertifikat bestätigen",
+        "Verbindungsstabilität testen und bei Problemen IT kontaktieren",
+      ],
+      workflowUrl: "https://workflow.coop.ch/vpn-setup",
+      lastUpdated: "2024-12-08",
+      tags: "Test, Blob, Blub",
+    },
+  ];
 </script>

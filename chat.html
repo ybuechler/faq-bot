@@ -15,7 +15,6 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 0;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     font-size: 14px;;
   }
@@ -71,6 +70,7 @@
     border: 1px solid rgba(255, 127, 0, 0.1);
     box-shadow: 0 4px 20px rgba(255, 127, 0, 0.08);
     border-bottom-left-radius: 8px;
+    margin-right: 20%;
   }
 
   .sent {
@@ -79,6 +79,7 @@
     border: 1px solid rgba(255, 127, 0, 0.2);
     box-shadow: 0 4px 20px rgba(255, 127, 0, 0.12);
     border-bottom-right-radius: 8px;
+    margin-left: 20%;
   }
 
   .message-header {
@@ -264,33 +265,6 @@
     transform: none;
   }
 
-  #messageResetButton {
-    background: transparent;
-    color: var(--coop-orange);
-    border: 2px solid var(--coop-orange);
-    border-radius: 5px;
-    width: auto;
-    height: 48px;
-    padding: 0 20px 0 20px;
-    font-weight: 600;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    position: relative;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  #messageResetButton:hover {
-    background: linear-gradient(
-      135deg,
-      var(--coop-orange),
-      var(--coop-orange-dark)
-    );
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(255, 127, 0, 0.3);
-  }
-
   @keyframes slideUp {
     from {
       opacity: 0;
@@ -457,12 +431,6 @@
       height: 44px;
       width: 44px;
     }
-
-    #messageResetButton {
-      height: 44px;
-      padding: 0 16px 0 40px;
-      font-size: 12px;
-    }
   }
 
   /* Dark theme support */
@@ -568,7 +536,6 @@
   <div class="input-container">
     <input type="text" id="messageInput" placeholder="Deine Frage..." />
     <button id="messageSendButton"><i class="send-icon"></i></button>
-    <button id="messageResetButton" class="reset-icon">Verlauf löschen</button>
   </div>
 </div>
 
@@ -597,21 +564,16 @@
     "Es gab ein Problem. Bitte versuche es später erneut.";
   if (userLanguage === "English") {
     document.getElementById("messageInput").placeholder = "Your question...";
-    document.getElementById("messageResetButton").textContent = "Clear History";
     defaultInitialMessage = `What do you want to know about ${customerName}?`;
     defaultResponseText = "Thank you for your question.";
     defaultErrorMessage = "There was a problem. Please try again later.";
   } else if (userLanguage === "français") {
     document.getElementById("messageInput").placeholder = "Ta question...";
-    document.getElementById("messageResetButton").textContent =
-      "Effacer l'historique";
     defaultInitialMessage = `Que veux-tu savoir sur ${customerName}?`;
     defaultResponseText = "Merci pour ta question.";
     defaultErrorMessage = "Il y a eu un problème. Essayer à nouveau plus tard.";
   } else if (userLanguage === "italiano") {
     document.getElementById("messageInput").placeholder = "La tua domanda...";
-    document.getElementById("messageResetButton").textContent =
-      "Cancella cronologia";
     defaultInitialMessage = `Cosa vuoi sapere su ${customerName}?`;
     defaultResponseText = "Grazie per la tua domanda.";
     defaultErrorMessage =
@@ -740,25 +702,6 @@
     typingElements.forEach((element) => element.remove());
   }
 
-  async function clearChat() {
-    try {
-      fetch(API_URL + "/clear", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${API_KEY}`,
-        },
-        body: JSON.stringify({
-          chatId: chatId,
-          customerName: customerNo,
-        }),
-      });
-      clearMessages();
-    } catch (error) {
-      console.error("Fehler:", error);
-    }
-  }
-
   async function loadHistory() {
     try {
       const response = await fetch(API_URL + "/history", {
@@ -835,9 +778,6 @@
   document
     .getElementById("messageSendButton")
     .addEventListener("click", sendMessage);
-  document
-    .getElementById("messageResetButton")
-    .addEventListener("click", clearChat);
 
   if (userLanguage === "English") {
     input.placeholder = `Your question to ${customerName}...`;

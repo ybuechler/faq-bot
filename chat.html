@@ -1,0 +1,706 @@
+<title>Chat Interface</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    }
+
+    .chat-container {
+        flex-grow: 1;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 0;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .chat-messages {
+        height: calc(100vh - 90px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #0082a1 transparent;
+        padding: 20px;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    }
+
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #0082a1, #87c8d9);
+        border-radius: 10px;
+    }
+
+    .message {
+        margin: 20px 0;
+        padding: 0;
+        border-radius: 20px;
+        word-wrap: break-word;
+        display: flex;
+        gap: 12px;
+        text-align: left;
+        flex-direction: column;
+        max-width: 85%;
+        position: relative;
+        animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .received {
+        align-self: flex-start;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid rgba(0, 130, 161, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 130, 161, 0.08);
+        border-bottom-left-radius: 8px;
+    }
+
+    .sent {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #ecf3f7 0%, #d4e8f0 100%);
+        border: 1px solid rgba(0, 130, 161, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 130, 161, 0.12);
+        border-bottom-right-radius: 8px;
+    }
+
+    .message-header {
+        display: flex;
+        align-items: center;
+        padding: 16px 20px 8px 20px;
+        gap: 10px;
+    }
+
+    .message-header-text {
+        font-weight: 600;
+        font-size: 13px;
+        color: #0082a1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .message-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0082a1, #87c8d9);
+        box-shadow: 0 2px 10px rgba(0, 130, 161, 0.3);
+        position: relative;
+    }
+
+    .message-icon::after {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .brain-icon {
+                background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI1LjMuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAyNS44NDU0IDI0IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyNS44NDU0IDI0OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxnIGZpbGw9IiMwMDgyYTEiPgoJPHBhdGggZD0iTTExLjgxOTcsMTMuNTkwNGMtMC4zMjUsMC0wLjU4OTUtMC4yNjU0LTAuNTg5NS0wLjU5MDRjLTAuMDg1OS0xLjAxNzgsMC4yODItMi4wMDE1LDEuMDA5MS0yLjcwNzEKCQljMC40NTE0LTAuMzY2OSwxLjAyODYtMC41NzE5LDEuNjE5LTAuNTcxOWMwLjExNzYsMCwwLjIzNTIsMC4wMDc4LDAuMzUyOCwwLjAyMzRjMC4xNTMyLDAuMDI1NCwwLjI4OTgsMC4xMDkzLDAuMzgyMSwwLjIzNzEKCQljMC4wOTIyLDAuMTI2OSwwLjEyOTMsMC4yODMsMC4xMDQ0LDAuNDM4MmMtMC4wNDY4LDAuMjg3OS0wLjI5MTMsMC40OTY3LTAuNTgxNiwwLjQ5NjdsMCwwCgkJQzEzLjk2NjcsMTAuOTAyOSwxMy45MTY5LDEwLjksMTMuODY3MiwxMC45Yy0wLjMxNjcsMC0wLjYyOCwwLjEwNzMtMC44NzY5LDAuMzAzNWMtMC40NDQsMC41MDQ1LTAuNjUwOSwxLjE1ODQtMC41ODEyLDEuODA3MwoJCUMxMi40MDg2LDEzLjMyNSwxMi4xNDQ3LDEzLjU5MDQsMTEuODE5NywxMy41OTA0eiIvPgoJPHBhdGggZD0iTTE5LjA1NTEsMjRjLTAuNTc3MywwLTEuMDg3Ny0wLjM0NjQtMS4yOTk5LTAuODgzMmMtMC4yNjk0LTAuODA2MS0wLjkzNzktMi40MTcyLTEuMzExNi0zLjMwNjJsLTAuMDMwMy0wLjA3MTIKCQlsLTAuMDc2NiwwLjAwOThjLTAuMTMwMywwLjAxNjYtMC4yNjAxLDAuMDI0NC0wLjM4OTQsMC4wMjQ0Yy0wLjk4MjMsMC0xLjkxNzctMC40NzIzLTIuNTAxMy0xLjI2MzdsLTAuMDQ0OS0wLjA2MDVsLTAuMDcwOCwwLjAyNDQKCQljLTAuMDgyNSwwLjAyOTMtMC4xNjY5LDAuMDUyNy0wLjI1MTgsMC4wNzIyYy0wLjUwMTYsMC4xMjg4LTEuMDE4OSwwLjE5NTItMS41NDA1LDAuMTk4MQoJCWMtMS4zMjM4LTAuMDA1OS0yLjYwODEtMC40ODMxLTMuNjE1My0xLjM0MThsLTAuMDU2Ni0wLjA0ODhsLTAuMDYzNCwwLjAzOWMtMC41NDExLDAuMzMzNy0xLjE2MjMsMC41MDk0LTEuNzk1NywwLjUwOTQKCQljLTEuNDExNy0wLjA1NDYtMi43MDQzLTAuNTE2Mi0zLjc5MDUtMS4zMzZjLTEuODE4Ni0xLjMzNzktMi41OTg5LTMuMjE0NS0yLjAzNzctNC44OTc5YzAuMTA0OS0wLjMxMDMsMC4yNDQ1LTAuNjA5OSwwLjQxMzgtMC44OQoJCUMwLjE1OTksOS42ODUsMC4xMjE0LDguNTY5NiwwLjQ5MDMsNy41NDNjMC40NjM2LTEuMDgyNywxLjI5Ni0xLjk5MDMsMi4zNDA3LTIuNTQ5YzAuNTEyNC0yLjQ1MzMsMi43NTc5LTMuMzAyMyw0LjcwNTktMy4zMDIzCgkJTDcuNzM0LDEuNjk1MUM4Ljg1NjMsMC41OTE0LDEwLjI1ODIsMCwxMS43NTc3LDBjMS4xMDEzLDAsMi4xNjY1LDAuMzI2NCwzLjA4MDUsMC45NDMybDAuMDQ3OCwwLjAzMjJsMC4wNTIyLTAuMDI0NAoJCWMwLjYyNDYtMC4yOTA4LDEuMzE4NS0wLjQ0NDUsMi4wMDc1LTAuNDQ0NWMwLjQwNjUsMCwwLjgxMTUsMC4wNTIyLDEuMjA0OCwwLjE1NTJjMS40OTMyLDAuMjk1MiwyLjczNTUsMS4zMDMzLDMuMzI5OCwyLjY5NzMKCQljMC45NjIzLDAuNDMyOCwzLjE1MDMsMS40NjcyLDMuODU4OCwyLjg4MTdjMC44NDIyLDEuNjg0OCwwLjY1MDksMy4zNDQ4LTAuNzAzNiw2LjEyN2MwLjY3NTMsMi41MzgyLTAuNjg3LDUuMTE2NS0zLjEwODMsNS45NDMKCQlsLTAuMTA1NCwwLjAzNjFsMS4zMTM2LDIuOTU0OWwtMC4wMDg4LDAuMTA1NGMwLDEuNDE5OS0xLjczODEsMi4zMzkyLTIuOTcyNiwyLjUzODJjLTAuMTczMiwwLjAyOTMtMC4zNDc0LDAuMDQzOS0wLjUyMTYsMC4wNDQ5CgkJQzE5LjE2NTQsMjMuOTk3MSwxOS4xMTAzLDI0LDE5LjA1NTEsMjR6IE0xNy4zMjkyLDE4Ljg4MjZjMC4wMTE3LDAuMDI3MywxLjE1NCwyLjY5MTQsMS41NDU5LDMuODY2NGwwLjAyMiwwLjA2NTRsMC4yMzc2LDAuMDA4OAoJCWMwLjUyMTEsMCwxLjAzNC0wLjEzOTUsMS40ODI5LTAuNDA0YzAuMzg2NS0wLjE2NDksMC43MTA1LTAuNDcyMywwLjkwMjctMC44NTg4bC0xLjc1OTYtNC4wNDU5bDAuNzQ5NS0wLjEyNzgKCQljMS4zOTM2LTAuMjc3MSwyLjUzMDYtMS4yODYyLDIuOTY4Ny0yLjYzMzljMC4zMDg0LTEuMTE1NCwwLjEwNjQtMi4yOTUyLTAuNTUwNC0zLjI0MjhjLTAuOTI0Mi0xLjI2MzctMi4zNS0yLjAzODYtMy45MTE1LTIuMTI2NAoJCWMtMC4zMTMzLTAuMDM0Mi0wLjU0OC0wLjMyMTEtMC41MTg3LTAuNjM5MmMwLjAyODMtMC4zMDU0LDAuMjgwMS0wLjUzNTgsMC41ODYtMC41MzU4YzEuOTQ4OSwwLjEyNDksMy42NzM0LDEuMDcyNSw0Ljc5MDgsMi42MDM2CgkJbDAuMTA3NCwwLjE0NzRsMC4wNjkzLTAuMTY5OGMwLjg4NDItMi4xNzUyLDAuNjM0My0zLjIxODQsMC4yMzIzLTQuMDIxNmMtMC40NzkyLTAuOTU5My0yLjQwMTctMS45NzI3LTMuNTAwNi0yLjM4NjUKCQlsLTAuMzE4MS0wLjExOTVsLTAuMDU1Ni0wLjMzNTdjLTAuMTQ4My0wLjg5MTUtMS4yMzk0LTEuODAyNC0yLjUzNjQtMi4xMTkxYy0wLjMwMjUtMC4wODU5LTAuNjE4Mi0wLjEyOTgtMC45MzQ5LTAuMTI5OAoJCWMtMS4wNjgxLDAtMi4wOTA5LDAuNTA3OS0yLjczNiwxLjM1ODljLTAuNDMxOCwwLjU3NDgtMC44OTkzLDEuMzkwNi0wLjY3ODMsMi4wMTM3YzAuMjE3MSwwLjYxMDQsMS4wMTg0LDAuODU1OCwxLjEwOTEsMC44ODIyCgkJYzAuMzE1NywwLjA4LDAuNTA3LDAuMzk4NiwwLjQzMDQsMC43MTA5Yy0wLjA2NDksMC4yNjQ5LTAuMzAwMSwwLjQ0OTktMC41NzE5LDAuNDQ5OWMtMC4wNDY4LDAtMC4wOTQyLTAuMDA1OS0wLjE0LTAuMDE3MQoJCWMtMC41NjUxLTAuMTYtMS4wODEzLTAuNDY5OS0xLjQ4OTMtMC44OTQ5bC0wLjA3ODYtMC4wODE1TDEyLjcxMTIsNi4xODZjLTAuNjAyNiwwLjcxMjQtMS40NDQ4LDEuMTY5Ni0yLjM3MSwxLjI4NzcKCQljLTAuMDAwNSwwLTAuMDAxLDAtMC4wMDEsMGMtMC4zNTE4LDAtMC42MDE3LTAuMjI4NC0wLjYzMTQtMC41Mjg5QzkuNjkyMiw2Ljc4ODEsOS43Mzg1LDYuNjM0OSw5LjgzODEsNi41MTM0CgkJYzAuMDk5NS0wLjEyMiwwLjI0MTEtMC4xOTc2LDAuMzk4Mi0wLjIxMzJjMS4wMjIzLTAuMTMyNywxLjg1MzMtMC44OTYzLDIuMDY5NC0xLjkwMWMwLjEzNDctMC43NjAyLDAuNDYzMS0xLjQ3MzEsMC45NTAxLTIuMDY1NAoJCWMwLjE0LTAuMTg2OSwwLjI5MDMtMC4zNTk2LDAuNDUxOC0wLjUyMTFsMC4xMDItMC4xMDE1bC0wLjEyOTMtMC4wNjI1Yy0wLjYzNTgtMC4zMDg0LTEuMjkwMi0wLjQ2NS0xLjk0NDUtMC40NjUKCQljLTEuMTg1MywwLTIuMzAyMiwwLjUxNjItMy4zMjA2LDEuNTM0MUw4LjE4NjMsMi45NDY2TDcuOTQ0OCwyLjg4ODFDNy45MDQzLDIuODg1Miw3Ljc4MTMsMi44NzY0LDcuNTk4MywyLjg3NjQKCQljLTAuOTk3OSwwLTMuMzQ1NCwwLjI0ODQtMy41OTk3LDIuNTQ2NUwzLjk2MDYsNS43NjI1TDMuNjQ3OCw1Ljg5ODFjLTAuOTA3MSwwLjQyNi0xLjYzNjEsMS4xNTkzLTIuMDU2MywyLjA2NTQKCQljLTAuMTg0LDAuNTI1LTAuMjEzNywxLjA3OTMtMC4wODg4LDEuNjExMmwwLjAzNDYsMC4xNDgzbDAuMTIzNS0wLjA4ODhDMS44MTM2LDkuNTI1LDEuOTc1MSw5LjQyNzQsMi4xNDM1LDkuMzQ0NAoJCWMwLjUzNDMtMC4yNDg4LDEuMTU2LTAuMzc0NywxLjg0NS0wLjM3NDdjMS4yMDY3LDAsMi4yMDg1LDAuMzgyNSwyLjMxODgsMC40MjY1YzAuMTQ1OSwwLjA1ODYsMC4yNjExLDAuMTY5OCwwLjMyMywwLjMxNTIKCQljMC4wNjI1LDAuMTQ0NCwwLjA2NDksMC4zMDQ1LDAuMDA2MywwLjQ0OTljLTAuMDg5OCwwLjIyNjQtMC4zMDQ1LDAuMzcxOC0wLjU0NywwLjM3MThjLTAuMDc0NywwLTAuMTQ4My0wLjAxMzctMC4yMTg2LTAuMDQyCgkJYy0wLjA5NjEtMC4wMzYxLTAuOTM4My0wLjM0NDUtMS44ODYtMC4zNDQ1Yy0wLjUxMzgsMC0wLjk2ODYsMC4wOTA4LTEuMzUyNiwwLjI2OTNjLTAuNjYwNywwLjMyODktMS4xNDcyLDAuOTIyMi0xLjMzNzUsMS42MzA3CgkJYy0wLjU5MDQsMS43NzMyLDEuMDkwNiwzLjE4MDQsMS42MTk1LDMuNTY4N2MwLjkzNTksMC42ODgsMi4wNjM2LDEuMDk4OCwzLjAxNywxLjA5ODhjMC4zNTM4LDAsMC42NzM0LTAuMDU0NiwwLjk0OTYtMC4xNjM5CgkJbDAuMTMwMy0wLjA1MDdMNi45MjMsMTYuMzkxMmMtMC40MDc5LTAuNDk4Ny0wLjc0MzYtMS4wNDkxLTAuOTk2OS0xLjYzNjVjLTAuMDYwNS0wLjE0NDQtMC4wNjEtMC4zMDQ1LTAuMDAxLTAuNDUwOQoJCWMwLjA1OTUtMC4xNDU0LDAuMTcyNy0wLjI1ODYsMC4zMTgxLTAuMzIwMWMwLjA3MjItMC4wMzAzLDAuMTQ4OC0wLjA0NTksMC4yMjY0LTAuMDQ1OWMwLjIzODYsMCwwLjQ1MjMsMC4xNDI1LDAuNTQ0MSwwLjM2MwoJCWMwLjE0MzUsMC4zMzQ3LDEuNDg2MywzLjI1OTQsNC41MzM2LDMuMjU4NGMwLjQxMTMsMCwwLjg0MDgtMC4wNTQ2LDEuMjc2LTAuMTYzOWMwLjE1MjctMC4wMzQyLDEuNTQyNC0wLjM5NjIsMi41MjI3LTIuNDIwMgoJCWMwLjE0MzUtMC4zMTIzLDAuMzIzLTAuNjA1LDAuNTMzOC0wLjg3MDVjMC43MzA1LTAuODkxOSwxLjU2MjQtMS4zNjMzLDIuNDA1Ni0xLjM2MzNjMC4xODU0LDAsMC4zNzIzLDAuMDIzNCwwLjU1NTMsMC4wNjkzCgkJYzAuMzExMywwLjA4LDAuNTAyNiwwLjM5ODIsMC40MjY1LDAuNzEwNGMtMC4wNjQ5LDAuMjY0NS0wLjMwMDEsMC40NDk5LTAuNTcyOSwwLjQ0OTljLTAuMDQ2NCwwLTAuMDkzNy0wLjAwNTktMC4xMzk2LTAuMDE3NgoJCWMtMC4wODI1LTAuMDE5NS0wLjE2NzQtMC4wMzAzLTAuMjUzMy0wLjAzMDNjLTAuNjUyOSwwLTEuMjI2NywwLjU4MjYtMS41MTA3LDAuOTNjLTAuMTUyNywwLjE5NjEtMC4yODE2LDAuNDA5OS0wLjM4NDUsMC42MzcyCgkJYy0wLjQyNCwwLjkxOTMtMS4wNzMsMS43MjgzLTEuODc2NywyLjM0MDFsLTAuMDg1NCwwLjA2NDRsMC4wNjg4LDAuMDgyYzAuMjMxMywwLjI3NDIsMC42OTA1LDAuNjAyMSwxLjU2NzgsMC42MDIxCgkJYzAuMTg3NCwwLDAuMzk0My0wLjAxNTYsMC42MjMxLTAuMDQ4OGwwLjQ0Ny0wLjA2MzRMMTcuMzI5MiwxOC44ODI2eiIvPgo8L2c+Cjwvc3ZnPgo");
+        background-repeat: no-repeat;
+        height: 18px;
+        width: 20px;
+        background-size: contain;
+        z-index: 1;
+        filter: invert(1);
+    }
+
+    .user-icon {
+        background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI1LjQuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxpZ2h0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4IgogICAgIHZpZXdCb3g9IjAgMCAxOSAyNCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTkgMjQ7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGcgZmlsbD0iIzAwODJhMSI+Cgk8cGF0aCBkPSJNOS41LDEyLjhjMy4zLDAsNi0yLjcsNi02cy0yLjctNi02LTZzLTYsMi43LTYsNlM2LjIsMTIuOCw5LjUsMTIuOHogTTkuNSwxLjhjMi44LDAsNSwyLjIsNSw1cy0yLjIsNS01LDVzLTUtMi4yLTUtNQoJCVM2LjcsMS44LDkuNSwxLjh6Ii8+CiAgPHBhdGggZD0iTTkuNSwxMy4zYy01LjIsMC05LjUsNC4zLTkuNSw5LjVjMCwwLjIsMC4yLDAuNCwwLjUsMC40UzEsMjMsMSwyMi43YzAtNC43LDMuOC04LjUsOC41LTguNVMxOCwxOCwxOCwyMi43CgkJYzAsMC4zLDAuMiwwLjUsMC41LDAuNVMxOSwyMywxOSwyMi44QzE5LDE3LjYsMTQuNywxMy4zLDkuNSwxMy4zeiIvPgo8L2c+Cjwvc3ZnPgo");
+        background-repeat: no-repeat;
+        height: 18px;
+        width: 18px;
+        background-size: cover;
+        z-index: 1;
+        filter: invert(1);
+    }
+
+    .send-icon {
+        background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLQogIC0gQ29weXJpZ2h0IChjKSAyMDEwLCAyMDIzIEJTSSBCdXNpbmVzcyBTeXN0ZW1zIEludGVncmF0aW9uIEFHCiAgLQogIC0gVGhpcyBwcm9ncmFtIGFuZCB0aGUgYWNjb21wYW55aW5nIG1hdGVyaWFscyBhcmUgbWFkZQogIC0gYXZhaWxhYmxlIHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgRWNsaXBzZSBQdWJsaWMgTGljZW5zZSAyLjAKICAtIHdoaWNoIGlzIGF2YWlsYWJsZSBhdCBodHRwczovL3d3dy5lY2xpcHNlLm9yZy9sZWdhbC9lcGwtMi4wLwogIC0KICAtIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBFUEwtMi4wCiAgLS0+Cgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMjUuMy4xLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiCgkgdmlld0JveD0iMCAwIDcuNDgyNCAyNCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNy40ODI0IDI0OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+Cjxwb2x5Z29uIGZpbGw9IiNmZmZmZmYiIHBvaW50cz0iMS4xMzQzLDQuNjczMiAwLDUuNjU0MSA1LjQ5OSwxMS45OTk4IDAsMTguMzQ1IDEuMTM0MywxOS4zMjY1IDcuNDgyNCwxMS45OTk4ICIvPgo8L3N2Zz4K");
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: flex;
+        width: 8px;
+        height: 20px;
+        filter: brightness(0) invert(1);
+    }
+
+    .reset-icon {
+        background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI1LjMuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAyMi44NDU3IDI0IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMi44NDU3IDI0OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxnIGZpbGw9IiMwMDgyYTEiPgoJPHBhdGggZD0iTTYuMzI2NywyMi42OTYxYy0xLjg4MDktMC4wMDI5LTMuNDEyNi0xLjUzNTItMy40MTUtMy40MTZWOS4wODc3YzAtMC4yNzczLDAuMjI1Ni0wLjUwMjksMC41MDM0LTAuNTAyOQoJCWMwLjI3NzMsMCwwLjUwMjksMC4yMjU2LDAuNTAyOSwwLjUwMjl2MTAuMTkyNEMzLjkxOTQsMjAuNjA3Miw1LDIxLjY4NzMsNi4zMjY3LDIxLjY4ODNoMTAuMTkyOQoJCWMxLjMyNjItMC4wMDEsMi40MDYyLTEuMDgxMSwyLjQwNzItMi40MDgyVjkuMDg3N2MwLTAuMjc3MywwLjIyNjYtMC41MDI5LDAuNTAzOS0wLjUwMjlzMC41MDM5LDAuMjI1NiwwLjUwMzksMC41MDI5djEwLjE5MjQKCQljLTAuMDAyOSwxLjg4MDktMS41MzUyLDMuNDEzMS0zLjQxNSwzLjQxNmwwLDBINi4zMjY3eiIvPgoJPHBhdGggZD0iTTAuNTAzNCw2LjY3OTVDMC4yMjU2LDYuNjc5NSwwLDYuNDUzOSwwLDYuMTc2NmMwLTAuMjc3OCwwLjIyNTYtMC41MDM0LDAuNTAzNC0wLjUwMzRoNi43NzY0VjEuODA4NAoJCWMwLTAuMjc3OCwwLjIyNTYtMC41MDM0LDAuNTAzNC0wLjUwMzRoNy4yNzkzYzAuMjc3MywwLDAuNTAzOSwwLjIyNTYsMC41MDM5LDAuNTAzNHYzLjg2NDdoNi43NzY0CgkJYzAuMjc3MywwLDAuNTAyOSwwLjIyNTYsMC41MDI5LDAuNTAzNGMwLDAuMjc3My0wLjIyNTYsMC41MDI5LTAuNTAyOSwwLjUwMjlIMC41MDM0eiBNOC4yODYxLDUuNjczMWg2LjI3MjVWMi4zMTEzSDguMjg2MVY1LjY3MzF6CgkJIi8+CjwvZz4KPC9zdmc+Cg");
+        background-repeat: no-repeat;
+        background-size: 18px;
+        background-position-y: center;
+        background-position-x: 12px;
+    }
+
+    .input-container {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        padding: 20px 20px 0px 20px;
+        display: flex;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(0, 130, 161, 0.1);
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        align-items: center;
+    }
+
+    input {
+        flex-grow: 1;
+        padding: 16px 20px;
+        border: 2px solid rgba(0, 130, 161, 0.2);
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        font-size: 15px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #0082a1;
+        box-shadow: 0 0 0 4px rgba(0, 130, 161, 0.15);
+        background: white;
+        transform: translateY(-1px);
+    }
+
+    input::placeholder {
+        color: rgba(0, 130, 161, 0.6);
+    }
+
+    button {
+        padding: 0;
+        border: none;
+        border-radius: 10%;
+        background: linear-gradient(135deg, #0082a1 0%, #016078 100%);
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 48px;
+        width: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 130, 161, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    button::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s;
+    }
+
+    button:hover {
+        background: linear-gradient(135deg, #016078 0%, #0082a1 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 130, 161, 0.4);
+    }
+
+    button:hover::before {
+        transform: translateX(100%);
+    }
+
+    button:active {
+        transform: translateY(0px) scale(0.95);
+    }
+
+    button.disabled {
+        background: linear-gradient(135deg, #dadada, #c0c0c0);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    #messageResetButton {
+        background: transparent;
+        color: #0082a1;
+        border: 2px solid #0082a1;
+        border-radius: 5px;
+        width: auto;
+        height: 48px;
+        padding: 0 20px 0 20px;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #messageResetButton:hover {
+        background: linear-gradient(135deg, #0082a1, #016078);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0, 130, 161, 0.3);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.7;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+    }
+
+    .markdown {
+        padding: 8px 20px 20px 20px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.6;
+        color: #2c3e50;
+    }
+
+    .markdown h1,
+    .markdown h2,
+    .markdown h3,
+    .markdown h4,
+    .markdown h5,
+    .markdown h6 {
+        margin-top: 16px;
+        margin-bottom: 8px;
+        color: #0082a1;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .markdown p {
+        margin-bottom: 12px;
+        line-height: 1.7;
+    }
+
+    .markdown code {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-size: 13px;
+        color: #0082a1;
+        border: 1px solid rgba(0, 130, 161, 0.1);
+    }
+
+    .markdown pre {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 16px;
+        border-radius: 12px;
+        margin: 16px 0;
+        overflow-x: auto;
+        border: 1px solid rgba(0, 130, 161, 0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .markdown pre code {
+        background: transparent;
+        padding: 0;
+        border: none;
+        color: #2c3e50;
+    }
+
+    .markdown blockquote {
+        border-left: 4px solid #0082a1;
+        padding-left: 16px;
+        margin: 16px 0;
+        color: #666;
+        background: rgba(0, 130, 161, 0.05);
+        border-radius: 0 8px 8px 0;
+        padding: 12px 16px;
+    }
+
+    .markdown ul,
+    .markdown ol {
+        margin: 12px 0 12px 24px;
+        padding: 0;
+    }
+
+    .markdown li {
+        margin: 8px 0;
+        line-height: 1.6;
+    }
+
+    .markdown a {
+        color: #0082a1;
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .markdown a:hover {
+        border-bottom-color: #0082a1;
+        background: rgba(0, 130, 161, 0.05);
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
+
+    .typing {
+        padding: 20px;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0082a1, #87c8d9);
+        display: inline-block;
+        animation: pulse 1.4s ease-in-out infinite;
+        box-shadow: 0 2px 4px rgba(0, 130, 161, 0.3);
+    }
+
+    .dot:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    /* Responsiveness */
+    @media (max-width: 768px) {
+        .message {
+            max-width: 95%;
+        }
+        
+        .input-container {
+            padding: 15px;
+            gap: 10px;
+        }
+        
+        input {
+            padding: 14px 18px;
+            font-size: 16px;
+        }
+        
+        button {
+            height: 44px;
+            width: 44px;
+        }
+        
+        #messageResetButton {
+            height: 44px;
+            padding: 0 16px 0 40px;
+            font-size: 12px;
+        }
+    }
+
+    /* Dark theme support */
+    @media (prefers-color-scheme: dark) {
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
+        }
+        
+        .chat-container {
+            background: rgba(26, 26, 26, 0.95);
+        }
+        
+        .received {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: #e2e8f0;
+        }
+        
+        .sent {
+            background: linear-gradient(135deg, #2a4365 0%, #3182ce 100%);
+            color: #e2e8f0;
+        }
+        
+        .markdown {
+            color: #e2e8f0;
+        }
+        
+        input {
+            background: rgba(45, 55, 72, 0.9);
+            color: #e2e8f0;
+            border-color: rgba(0, 130, 161, 0.3);
+        }
+        
+        input::placeholder {
+            color: rgba(226, 232, 240, 0.6);
+        }
+    }
+</style>
+
+<div class="chat-container">
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="input-container">
+        <input type="text" id="messageInput" placeholder="Deine Frage...">
+        <button id="messageSendButton"><i class="send-icon"></i></button>
+        <button id="messageResetButton" class="reset-icon">Verlauf löschen</button>
+    </div>
+</div>
+
+<script type="module">
+    const API_URL = '/bsiinterfaces/web-api/l/ai-chat';
+    const API_KEY = 'c1f8765d-981a-4c82-941b-002245282f30';
+
+    const params = new URLSearchParams(window.location.search);
+    const chatId = params.get('chatId') || 'chatId';
+    const userName = params.get('userName') || 'UserName';
+    const customerName = params.get('customerName') || 'CustomerName';
+
+    const userLanguage = params.get('userLanguage') || 'Deutsch';
+    let defaultInitialMessage = `Was möchtest Du über ${customerName} wissen?`;
+    let defaultResponseText = "Danke für Deine Frage.";
+    let defaultErrorMessage = "Es gab ein Problem. Bitte versuche es später erneut.";
+    if (userLanguage === 'English') {
+        document.getElementById('messageInput').placeholder = 'Your question...';
+        document.getElementById('messageResetButton').textContent = 'Clear History';
+        defaultInitialMessage = `What do you want to know about ${customerName}?`;
+        defaultResponseText = "Thank you for your question.";
+        defaultErrorMessage = "There was a problem. Please try again later.";
+    } else if  (userLanguage === 'français') {
+        document.getElementById('messageInput').placeholder = 'Ta question...';
+        document.getElementById('messageResetButton').textContent = 'Effacer l\'historique';
+        defaultInitialMessage = `Que veux-tu savoir sur ${customerName}?`;
+        defaultResponseText = "Merci pour ta question.";
+        defaultErrorMessage = "Il y a eu un problème. Essayer à nouveau plus tard.";
+    } else if  (userLanguage === 'italiano') {
+        document.getElementById('messageInput').placeholder = 'La tua domanda...';
+        document.getElementById('messageResetButton').textContent = 'Cancella cronologia';
+        defaultInitialMessage = `Cosa vuoi sapere su ${customerName}?`;
+        defaultResponseText = "Grazie per la tua domanda.";
+        defaultErrorMessage = "C'è stato un problema. Per favore, riprova più tardi.";
+    };
+
+    const initialMessage = params.get('initialMessage') || defaultInitialMessage;
+    
+
+    const input = document.getElementById('messageInput');
+    const messageSendButton = document.getElementById('messageSendButton');
+
+    async function loadScript(fileName) {
+        const response = await fetch(API_URL + `/script/${fileName}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`
+            }
+        });
+        return await response.text();
+    }
+
+    async function loadScriptMarked() {
+        eval(await loadScript('marked.js'));
+        marked.setOptions({
+            breaks: true,
+            sanitize: true
+        });
+    }
+
+    async function sendMessage() {
+        const message = input.value.trim();
+        input.value = '';
+
+        if (!message) return;
+
+        addMessage(message, false);
+
+        try {
+            createTypingIndicator();
+
+            messageSendButton.disabled = true;
+
+            const response = await fetch(API_URL + '/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    chatId: chatId,
+                    userName: userName,
+                    customerName: customerName,
+                    initialMessage: initialMessage,
+                    message: message
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('API-Error');
+            }
+
+            const data = await response.json();
+
+            setTimeout(() => {
+                removeTypingIndicator();
+                const responseText = data.response || defaultResponseText;
+                addMessage(responseText, true);
+            }, 500);
+
+        } catch (error) {
+            console.error('Fehler:', error);
+            removeTypingIndicator();
+            addMessage(defaultErrorMessage, true);
+        }
+        finally {
+            messageSendButton.disabled = false;
+        }
+    }
+
+    function addMessage(text, isReceived, typing = false) {
+        const chatMessages = document.getElementById('chatMessages');
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isReceived ? 'received' : 'sent'} ${typing ? 'typing' : ''}`;
+
+        const content = !typing
+            ? marked.parse(text)
+            : `
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            `;
+
+        messageDiv.innerHTML = `
+            <div class="message-header">
+                <div class="message-icon">
+                    <i class="${isReceived ? 'brain' : 'user'}-icon"></i>
+                </div>
+                <span class="message-header-text">${isReceived ? 'Companion' : userName}</span>
+            </div>
+            <span class="markdown">${content}</span>
+        `
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        return messageDiv;
+    }
+
+    function clearMessages() {
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.innerHTML = '';
+        addMessage(initialMessage, true);
+    }
+
+    function createTypingIndicator() {
+        addMessage('', true, true);
+    }
+
+    function removeTypingIndicator() {
+        const typingElements = document.querySelectorAll('.typing');
+        typingElements.forEach(element => element.remove());
+    }
+
+    async function clearChat() {
+        try {
+            fetch(API_URL + '/clear', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    chatId: chatId,
+                    customerName: customerName
+                })
+            });
+            clearMessages();
+        } catch (error) {
+            console.error('Fehler:', error);
+        }
+    }
+
+    async function loadHistory() {
+        try {
+            const response = await fetch(API_URL + '/history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    chatId: chatId,
+                    customerName: customerName
+                })
+            });
+            const data = await response.json();
+
+            clearMessages();
+
+            const messages = data?.messages || [];
+
+            messages.forEach(m => addMessage(m.content, m.role === 'assistant'));
+        } catch (error) {
+            console.error('Fehler:', error);
+        }
+    }
+
+    await loadScriptMarked();
+
+    document.getElementById('messageInput').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && !event.shiftKey && messageSendButton.disabled != true) {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    document.getElementById('messageSendButton').addEventListener('click', sendMessage);
+    document.getElementById('messageResetButton').addEventListener('click', clearChat);
+
+    if (userLanguage === 'English') {
+        input.placeholder = `Your question to ${customerName}...`;
+    } else if  (userLanguage === 'français') {
+        input.placeholder = `Ta question à ${customerName}...`;
+    } else if  (userLanguage === 'italiano') {
+        input.placeholder = `La tua domanda a ${customerName}...`;
+    } else {
+        input.placeholder = `Deine Frage zu ${customerName}...`;
+    };
+    
+
+    loadHistory();
+</script>

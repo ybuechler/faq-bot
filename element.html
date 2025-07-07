@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markenswitcher Modern</title>
+
   <style>
 
 
@@ -19,7 +14,14 @@
       cursor: pointer;
       width: 200px;
       height: 60px;
+      box-shadow: none;
     }
+
+    .main-btn:hover {
+      background: none;
+      box-shadow: none;
+    }
+
 
     .main-btn img {
       width: 100%;
@@ -57,11 +59,16 @@
       padding: 0;
       cursor: pointer;
       transition: transform 0.2s ease;
+      box-shadow: none;
     }
 
     .brand-fan button:hover {
       transform: scale(1.05);
+      background: none;
+      box-shadow: none;
     }
+
+
 
     .brand-fan button img {
       width: 100%;
@@ -77,23 +84,22 @@
       width: 100%;
     }
   </style>
-</head>
-<body>
+
 
   <div class="brand-switcher">
     <button class="main-btn">
       <img src="https://www.coop.ch/etc/designs/seitenrahmen/images/format-logos-svg/logo-coop.svg" alt="Coop">
     </button>
     <div class="brand-fan">
-      <button data-url="https://fooby.ch">
+      <button class="sub-fan" data-url="https://fooby.ch">
         <img src="https://fooby.ch/etc/designs/fooby/frontend/default/assets/images/logo-header-desktop.svg" alt="Fooby">
       </button>
       <div class="divider"></div>
-      <button data-url="https://www.jumbo.ch">
+      <button class="sub-fan" data-url="https://bsi-2004.trials.bsi-software.com/i/e/l/self-service-portal-portal/de-CH/index">
         <img src="https://www.jumbo.ch/_ui/25.16.0.633/desktop/common/images/logo/logo-jumbo.svg" alt="Jumbo">
       </button>
       <div class="divider"></div>
-      <button data-url="https://www.livique.ch">
+      <button class="sub-fan" data-url="https://www.livique.ch">
         <img src="https://www.livique.ch/_ui/25.7.0.446/lilu/common/img/livique-logo.svg" alt="Livique">
       </button>
     </div>
@@ -120,5 +126,4 @@
     });
   </script>
 
-</body>
-</html>
+

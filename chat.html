@@ -19,9 +19,9 @@
   }
 
   .chat-messages {
-    height: calc(100vh - 300px);
+    height: auto;
     margin-bottom: 100px;
-    overflow-y: auto;
+    overflow-y: visible;
     scrollbar-width: thin;
     scrollbar-color: var(--coop-orange) transparent;
     padding: 20px;
@@ -164,7 +164,7 @@
   }
 
   .input-container {
-    position: fixed;
+    position: fixed !important;
     bottom: 0;
     right: 0;
     left: 0;
@@ -175,7 +175,7 @@
     backdrop-filter: blur(20px);
     border-top: 1px solid rgba(255, 127, 0, 0.1);
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
-    z-index: 100;
+    z-index: 2000;
     align-items: center;
   }
 
@@ -518,6 +518,31 @@
     height: 100%;
     border: none;
   }
+
+
+  /* ---------------------------------------------------------- */
+/* Eingabeleiste: schwebend & nur so breit wie der Content    */
+/* ---------------------------------------------------------- */
+.input-container{
+  position: fixed !important;      /* fix am Viewport         */
+  bottom: 120px;                    /* 20 px vom Rand = Float   */
+  left: 50%;                       /* horizontal zentrieren   */
+  transform: translateX(-50%);     /*  … per Übersetzung      */
+
+  /* Breite entspricht dem Bootstrap-Container  */
+  width: calc(100% - 40px);        /* 20 px Seiten-Padding     */
+  max-width: 1140px;               /* Container-Breite ≥ XL    */
+
+  /* Look & Feel */
+  border-radius: 14px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fff1e5 0%, #ffe3cc 100%);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  gap: 12px;
+  z-index: 2000;
+}
+
 </style>
 
 <div id="variables" style="display: none;">
@@ -532,10 +557,10 @@
 
 <div class="chat-container">
   <div class="chat-messages" id="chatMessages"></div>
-  <div class="input-container">
-    <input type="text" id="messageInput" placeholder="Deine Frage..." />
-    <button id="messageSendButton"><i class="send-icon"></i></button>
-  </div>
+</div>
+<div class="input-container">
+  <input type="text" id="messageInput" placeholder="Deine Frage..." />
+  <button id="messageSendButton"><i class="send-icon"></i></button>
 </div>
 
 <div id="linkPopup">
@@ -674,7 +699,7 @@
                     <i class="${isReceived ? "brain" : "user"}-icon"></i>
                 </div>
                 <span class="message-header-text">${
-                  isReceived ? "Companion" : userName
+                  isReceived ? "Coop Companion" : userName
                 }</span>
             </div>
             <span class="markdown">${content}</span>
@@ -735,7 +760,7 @@
       e.preventDefault();
       const url = anchor.href;
 
-      if (url.includes("trials.bsi-software.com")) {
+      if (url.includes("trials.bsi-software.com") && !url.includes("bsi-2004.trials.bsi-software.com/i/e/l/quittung")) {
         // Öffne im Popup
         const popup = document.getElementById("linkPopup");
         const iframe = document.getElementById("popupIframe");

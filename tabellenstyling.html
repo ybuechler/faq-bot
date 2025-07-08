@@ -21,3 +21,73 @@
     transform: scale(0.96); /* kleines “Klick”-Feedback */
   }
 </style>
+
+<script>
+  // Nur ausführen, wenn <html> nicht die Klassen "bsi-ce-edit-mode" oder "bsi-ce-preview-mode" hat
+  if (
+    !(
+      document.documentElement.classList.contains("bsi-ce-edit-mode") ||
+      document.documentElement.classList.contains("bsi-ce-preview-mode")
+    )
+  ) {
+    // Funktion zum Sortieren der Tabelle
+    function sortTable() {
+      const table = document.querySelector("table");
+      if (!table) return; // Falls Tabelle noch nicht vorhanden ist, abbrechen
+
+      const tbody = table.querySelector("tbody");
+      const allRows = Array.from(tbody.querySelectorAll("tr"));
+
+      if (allRows.length === 0) return; // Keine Zeilen vorhanden
+
+      // Prüfen ob die erste Zeile Header-Zellen enthält
+      const hasHeader = allRows[0].querySelectorAll("th").length > 0;
+
+      // Headerzeile abtrennen (falls vorhanden)
+      let headerRow = null;
+      let dataRows = allRows;
+      if (hasHeader) {
+        headerRow = allRows[0];
+        dataRows = allRows.slice(1);
+      }
+
+      // Nur Zeilen mit Bestelldatum filtern
+      const rowsWithDates = dataRows.filter((row) =>
+        row.querySelector('td[data-header="Bestelldatum"]')
+      );
+
+      if (rowsWithDates.length === 0) return; // Keine Datenzeilen zum Sortieren
+
+      // Zeilen sortieren nach Bestelldatum (absteigend)
+      const sortedRows = rowsWithDates.slice().sort((a, b) => {
+        const dateACell = a.querySelector('td[data-header="Bestelldatum"]');
+        const dateBCell = b.querySelector('td[data-header="Bestelldatum"]');
+
+        if (!dateACell || !dateBCell) return 0;
+
+        const dateA = dateACell.innerText.trim().split(".").reverse().join("-");
+        const dateB = dateBCell.innerText.trim().split(".").reverse().join("-");
+        return new Date(dateB) - new Date(dateA);
+      });
+
+      // Tbody leeren
+      while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+      }
+
+      // Headerzeile wieder einfügen (falls vorhanden)
+      if (headerRow) tbody.appendChild(headerRow);
+
+      // Sortierte Zeilen einfügen
+      sortedRows.forEach((row) => tbody.appendChild(row));
+    }
+
+    // Ausführen, sobald die Tabelle im DOM ist
+    if (document.readyState === 'complete') {
+        sortTable();
+    } else {
+        window.addEventListener('load', () => sortTable());
+    }
+
+  }
+</script>

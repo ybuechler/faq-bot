@@ -543,6 +543,65 @@
   z-index: 2000;
 }
 
+
+.welcome-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 3000;
+  width: calc(100% - 40px);
+  max-width: 1140px;
+}
+
+.input-container.centered h2 {
+  margin: 0;
+  color: var(--coop-orange);
+  font-size: 24px;
+}
+
+.input-container.centered {
+  position: static;
+  display: flex;
+  flex-direction: column; /* stapelt Titel und Input */
+  align-items: center;    /* zentriert horizontal */
+  gap: 12px;              /* Abstand zwischen Titel & Input */
+  width: 60%;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #fff1e5 0%, #ffe3cc 100%);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 20px;
+}
+
+body.show-welcome .input-container.fixed {
+  display: none;
+}
+
+.input-row {
+  display: flex;
+  gap: 12px; /* Abstand zwischen Input und Button */
+  width: 100%;
+  align-items: center; /* vertikal zentrieren */
+}
+
+.input-row input {
+  flex-grow: 1; /* Input nimmt die ganze Breite */
+  height: 48px; /* gleiche Höhe wie Button */
+  padding: 12px 16px;
+  font-size: 16px;
+}
+
+.input-row button {
+  height: 48px; /* gleiche Höhe wie Input */
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
 </style>
 
 <div id="variables" style="display: none;">
@@ -558,7 +617,20 @@
 <div class="chat-container">
   <div class="chat-messages" id="chatMessages"></div>
 </div>
-<div class="input-container">
+
+<div class="welcome-container" id="welcomeContainer">
+  <div class="input-container centered">
+    <h2>Wie kann ich heute helfen?</h2>
+    <div class="input-row">
+      <input type="text" id="messageInput" placeholder="Deine Frage..." />
+      <button id="messageSendButton"><i class="send-icon"></i></button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="input-container fixed">
   <input type="text" id="messageInput" placeholder="Deine Frage..." />
   <button id="messageSendButton"><i class="send-icon"></i></button>
 </div>
@@ -628,6 +700,30 @@
     });
   }
 
+  function checkMessages() {
+  const chatMessages = document.getElementById("chatMessages");
+  const welcomeContainer = document.getElementById("welcomeContainer");
+  const inputContainer = document.querySelector(".input-container");
+
+  if (chatMessages.children.length === 0) {
+    // Noch keine Nachrichten => zentriert anzeigen
+    welcomeContainer.style.display = "block";
+    inputContainer.classList.add("centered");
+    inputContainer.classList.remove("fixed");
+    document.body.classList.add("show-welcome");
+  } else {
+    // Nachrichten vorhanden => unten anzeigen
+    welcomeContainer.style.display = "none";
+    inputContainer.classList.remove("centered");
+    inputContainer.classList.add("fixed");
+    document.body.classList.remove("show-welcome");
+  }
+}
+
+// Direkt nach dem Laden prüfen
+checkMessages();
+
+
   async function sendMessage() {
     const message = input.value.trim();
     input.value = "";
@@ -635,6 +731,7 @@
     if (!message) return;
 
     addMessage(message, false);
+    checkMessages();
 
     try {
       createTypingIndicator();
@@ -667,11 +764,13 @@
         removeTypingIndicator();
         const responseText = data.response || defaultResponseText;
         addMessage(responseText, true);
+        checkMessages();
       }, 500);
     } catch (error) {
       console.error("Fehler:", error);
       removeTypingIndicator();
       addMessage(defaultErrorMessage, true);
+      checkMessages();
     } finally {
       messageSendButton.disabled = false;
     }
@@ -714,7 +813,7 @@
   function clearMessages() {
     const chatMessages = document.getElementById("chatMessages");
     chatMessages.innerHTML = "";
-    addMessage(initialMessage, true);
+    //addMessage(initialMessage, true);
   }
 
   function createTypingIndicator() {
@@ -804,13 +903,13 @@
     .addEventListener("click", sendMessage);
 
   if (userLanguage === "English") {
-    input.placeholder = `Your question to ${customerName}...`;
+    input.placeholder = `Your question...`;
   } else if (userLanguage === "français") {
-    input.placeholder = `Ta question à ${customerName}...`;
+    input.placeholder = `Ta question...`;
   } else if (userLanguage === "italiano") {
-    input.placeholder = `La tua domanda a ${customerName}...`;
+    input.placeholder = `La tua domanda...`;
   } else {
-    input.placeholder = `Deine Frage zu ${customerName}...`;
+    input.placeholder = `Deine Frage...`;
   }
 
   loadHistory();

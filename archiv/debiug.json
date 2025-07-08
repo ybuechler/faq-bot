@@ -1,15 +1,54 @@
 {
-  "Kundeninformationen durchsuchen (coop)": {
-    "definition": {
-      "_type": "ml.AgentToolDefinition",
-      "description": "Kundeninformationen durchsuchen (coop)\nAutomatisch generierte Signatur auf Basis der Brain-Inputs und -Outputs\nLiefert die Informationen über den Kunden zurück.\nWie z.B. Stammdaten, Kommunikationen, etc.",
-      "name": "Kundeninformationen durchsuchen (coop)"
-    },
-    "executions": {
-      "input": {},
-      "output": {
-        "customerdata": "{\"age\":29.0,\"name\":\"Yann Büchler\",\"preferredPhysicalAddress/block\":\"Herr\\nYann Büchler\\nZugerstrasse 74\\n6340 Baar\\nSWITZERLAND\",\"y-purchases\":[{\"Kaufsumme\":\"49,30 CHF\",\"Shop\":\"Jumbo\",\"URL für Quittung\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/quittung?kaufNo=J92237485&customerNo=1000000001\",\"y-purchaseDate\":\"2025-05-13 00:00:00.000\",\"y-purchaseNo\":\"J92237485\",\"y-purchasePositions\":[{\"Artikelbezeichnung\":\"Topeak Mini 20 Pro Multitool\",\"Preis\":\"49,30 CHF\",\"URL für Mangel oder Rückgabe\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/mangel?articleId=J92237485-1&customerNo=1000000001\",\"y-quantity\":2.0}],\"y-store\":{\"_type\":\"bsiscout.DataModelValue\",\"_typeVersion\":\"bsiscout-8.0.0.040\",\"type\":\"Key:Entity:CrmCustomer\",\"value\":\"1;112210;318596;j1000149002\"}},{\"Kaufsumme\":\"5899,90 CHF\",\"Shop\":\"Jumbo\",\"URL für Quittung\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/quittung?kaufNo=J785213&customerNo=1000000001\",\"y-purchaseDate\":\"2025-07-02 00:00:00.000\",\"y-purchaseNo\":\"J785213\",\"y-purchasePositions\":[{\"Artikelbezeichnung\":\"Trek Domane SL 6\",\"Preis\":\"5890,00 CHF\",\"URL für Mangel oder Rückgabe\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/mangel?articleId=J785213-1&customerNo=1000000001\",\"y-quantity\":1.0},{\"Artikelbezeichnung\":\"3M Speichenreflektor\",\"Preis\":\"9,90 CHF\",\"URL für Mangel oder Rückgabe\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/mangel?articleId=J785213-2&customerNo=1000000001\",\"y-quantity\":1.0}],\"y-store\":{\"_type\":\"bsiscout.DataModelValue\",\"_typeVersion\":\"bsiscout-8.0.0.040\",\"type\":\"Key:Entity:CrmCustomer\",\"value\":\"1;112210;318596;j1000148994\"}},{\"Kaufsumme\":\"130,80 CHF\",\"Shop\":\"Coop Supermarkt\",\"URL für Quittung\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/quittung?kaufNo=C165123465&customerNo=1000000001\",\"y-purchaseDate\":\"2025-07-07 00:00:00.000\",\"y-purchaseNo\":\"C165123465\",\"y-purchasePositions\":[{\"Artikelbezeichnung\":\"Fahrradsocken Lang\",\"Preis\":\"34,80 CHF\",\"URL für Mangel oder Rückgabe\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/mangel?articleId=C165123465-1&customerNo=1000000001\",\"y-quantity\":2.0},{\"Artikelbezeichnung\":\"Fahrradweste Leicht\",\"Preis\":\"48,00 CHF\",\"URL für Mangel oder Rückgabe\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/mangel?articleId=C165123465-2&customerNo=1000000001\",\"y-quantity\":1.0},{\"Artikelbezeichnung\":\"Lezyne LED Rücklicht\",\"Preis\":\"32,80 CHF\",\"URL für Mangel oder Rückgabe\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/mangel?articleId=C165123465-3&customerNo=1000000001\",\"y-quantity\":1.0},{\"Artikelbezeichnung\":\"Spurcycle Compact Fahrradklingel\",\"Preis\":\"15,20 CHF\",\"URL für Mangel oder Rückgabe\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/mangel?articleId=C165123465-4&customerNo=1000000001\",\"y-quantity\":1.0}],\"y-store\":{\"_type\":\"bsiscout.DataModelValue\",\"_typeVersion\":\"bsiscout-8.0.0.040\",\"type\":\"Key:Entity:CrmCustomer\",\"value\":\"1;112210;318596;j1000149040\"}},{\"Kaufsumme\":\"122,85 CHF\",\"Shop\":\"coop.ch\",\"URL für Quittung\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/quittung?kaufNo=C123552345&customerNo=1000000001\",\"y-purchaseDate\":\"2025-06-23 00:00:00.000\",\"y-purchaseNo\":\"C123552345\",\"y-purchasePositions\":[{\"Artikelbezeichnung\":\"Kryptonite New York Bügelschloss\",\"Preis\":\"67,25 CHF\",\"URL für Mangel oder Rückgabe\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/mangel?articleId=C123552345-1&customerNo=1000000001\",\"y-quantity\":1.0},{\"Artikelbezeichnung\":\"Fahrradhandschuhe Winter\",\"Preis\":\"55,60 CHF\",\"URL für Mangel oder Rückgabe\":\"https://bsi-2004.trials.bsi-software.com/i/e/l/mangel?articleId=C123552345&customerNo=1000000001\",\"y-quantity\":1.0}],\"y-store\":{\"_type\":\"bsiscout.DataModelValue\",\"_typeVersion\":\"bsiscout-8.0.0.040\",\"type\":\"Key:Entity:CrmCustomer\",\"value\":\"1;112210;318596;j1000148993\"}}]}"
+  "stepData": {
+    "21aa18e2-1166-4af4-a16a-a8c1cbded2e4": "4",
+    "2c930dc3-e963-4c15-865b-24a46957a494": "de-CH",
+    "3ad1e661-6af8-4801-b29d-d1b1b0755609": "1000000001",
+    "428b692a-8635-4e92-bbab-ed3f7e29321e": "yann.buechler@gmail.com",
+    "5d534194-ac03-4466-8371-1394d1e82064": ",  ",
+    "8fa299c1-4cb5-4d3d-baf9-190ba7f48f66": [],
+    "a142a8c4-f33c-4dcc-8641-235cba090a0a": "1;142891;142890;j1000142902",
+    "a67e5c64-18cd-458a-8d02-7918260d39d8": [],
+    "c0ad2ffb-e8ef-44c9-a034-b8faaa84150a": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "c1715cb7-7eb9-4b75-97f8-4d9a8c799e11": [
+      {
+        "2cdec9cc-a3a1-490a-adfd-755d7ffd56fd": "1;190639;c1000013941;j1000149152",
+        "40fef0b7-7986-4115-99fc-cb1b3970d7e4": "Jumbo",
+        "6125203f-b213-42aa-ab74-1eadd5a17bfa": "49.30",
+        "7b9922e9-ac93-43ba-aab3-f2df6669e303": "J92237485",
+        "c933683e-2459-4a3c-a939-e8f3f077be09": "13.05.2025"
+      },
+      {
+        "2cdec9cc-a3a1-490a-adfd-755d7ffd56fd": "1;190639;c1000013941;j1000145853",
+        "40fef0b7-7986-4115-99fc-cb1b3970d7e4": "Jumbo",
+        "6125203f-b213-42aa-ab74-1eadd5a17bfa": "5’899.90",
+        "7b9922e9-ac93-43ba-aab3-f2df6669e303": "J785213",
+        "c933683e-2459-4a3c-a939-e8f3f077be09": "02.07.2025"
+      },
+      {
+        "2cdec9cc-a3a1-490a-adfd-755d7ffd56fd": "1;190639;c1000013941;j1000145854",
+        "40fef0b7-7986-4115-99fc-cb1b3970d7e4": "Coop Supermarkt",
+        "6125203f-b213-42aa-ab74-1eadd5a17bfa": "130.80",
+        "7b9922e9-ac93-43ba-aab3-f2df6669e303": "C165123465",
+        "c933683e-2459-4a3c-a939-e8f3f077be09": "07.07.2025"
+      },
+      {
+        "2cdec9cc-a3a1-490a-adfd-755d7ffd56fd": "1;190639;c1000013941;j1000145855",
+        "40fef0b7-7986-4115-99fc-cb1b3970d7e4": "coop.ch",
+        "6125203f-b213-42aa-ab74-1eadd5a17bfa": "122.85",
+        "7b9922e9-ac93-43ba-aab3-f2df6669e303": "C123552345",
+        "c933683e-2459-4a3c-a939-e8f3f077be09": "23.06.2025"
       }
+    ],
+    "c2491636-5fc4-4d89-ae14-97a045c5fed0": "1000000328",
+    "c8f64344-10b7-4151-ae7a-02a04f280b38": "1;190639;c1000013941;j1000145853",
+    "cbda8668-dedc-464a-ad2f-678bcbf3d7d0": "2",
+    "dd636d4b-8a66-4ca3-a4db-a0990635baee": "1’564",
+    "ed7e9ecb-289f-4c93-8afb-c199e670ef61": "Yann Büchler",
+    "efd0b39c-7247-4799-8184-6bcaf45cefcc": {
+      "_type": "bsiscout.PasswordHashAndSalt",
+      "_typeVersion": "bsiscout-11.0.0.036",
+      "hash": "ufh0QSE5m+aM9ZPDVvJKV0G+YHaaxmTBKmHV9RrFtoA=",
+      "salt": "7iQizHNKRpTRmxZBJStrlIoq02ePnXC5Y4q6ZTorRdc="
     }
   }
 }

@@ -15,7 +15,7 @@
     backdrop-filter: blur(10px);
     border-radius: 0;
     overflow: hidden;
-    font-size: 14px;;
+    font-size: 14px;
   }
 
   .chat-messages {
@@ -519,99 +519,95 @@
     border: none;
   }
 
-
   /* ---------------------------------------------------------- */
-/* Eingabeleiste: schwebend & nur so breit wie der Content    */
-/* ---------------------------------------------------------- */
-.input-container{
-  position: fixed !important;      /* fix am Viewport         */
-  bottom: 120px;                    /* 20 px vom Rand = Float   */
-  left: 50%;                       /* horizontal zentrieren   */
-  transform: translateX(-50%);     /*  … per Übersetzung      */
+  /* Eingabeleiste: schwebend & nur so breit wie der Content    */
+  /* ---------------------------------------------------------- */
+  .input-container {
+    position: fixed !important; /* fix am Viewport         */
+    bottom: 120px; /* 20 px vom Rand = Float   */
+    left: 50%; /* horizontal zentrieren   */
+    transform: translateX(-50%); /*  … per Übersetzung      */
 
-  /* Breite entspricht dem Bootstrap-Container  */
-  width: calc(100% - 40px);        /* 20 px Seiten-Padding     */
-  max-width: 1140px;               /* Container-Breite ≥ XL    */
+    /* Breite entspricht dem Bootstrap-Container  */
+    width: calc(100% - 40px); /* 20 px Seiten-Padding     */
+    max-width: 1140px; /* Container-Breite ≥ XL    */
 
-  /* Look & Feel */
-  border-radius: 14px;
-  padding: 20px;
-  background: linear-gradient(135deg, #fff1e5 0%, #ffe3cc 100%);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-  gap: 12px;
-  z-index: 2000;
-}
+    /* Look & Feel */
+    border-radius: 14px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff1e5 0%, #ffe3cc 100%);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    gap: 12px;
+    z-index: 2000;
+  }
 
+  .welcome-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 3000;
+    width: calc(100% - 40px);
+    max-width: 1140px;
+  }
 
-.welcome-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 3000;
-  width: calc(100% - 40px);
-  max-width: 1140px;
-}
+  .input-container.centered h2 {
+    margin: 0;
+    color: var(--coop-orange);
+    font-size: 24px;
+  }
 
-.input-container.centered h2 {
-  margin: 0;
-  color: var(--coop-orange);
-  font-size: 24px;
-}
+  .input-container.centered {
+    position: static;
+    display: flex;
+    flex-direction: column; /* stapelt Titel und Input */
+    align-items: center; /* zentriert horizontal */
+    gap: 12px; /* Abstand zwischen Titel & Input */
+    width: 60%;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #fff1e5 0%, #ffe3cc 100%);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    padding: 20px;
+  }
 
-.input-container.centered {
-  position: static;
-  display: flex;
-  flex-direction: column; /* stapelt Titel und Input */
-  align-items: center;    /* zentriert horizontal */
-  gap: 12px;              /* Abstand zwischen Titel & Input */
-  width: 60%;
-  margin: 0 auto;
-  background: linear-gradient(135deg, #fff1e5 0%, #ffe3cc 100%);
-  border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  padding: 20px;
-}
+  body.show-welcome .input-container.fixed {
+    display: none;
+  }
 
-body.show-welcome .input-container.fixed {
-  display: none;
-}
+  .input-row {
+    display: flex;
+    gap: 12px; /* Abstand zwischen Input und Button */
+    width: 100%;
+    align-items: center; /* vertikal zentrieren */
+  }
 
-.input-row {
-  display: flex;
-  gap: 12px; /* Abstand zwischen Input und Button */
-  width: 100%;
-  align-items: center; /* vertikal zentrieren */
-}
+  .input-row input {
+    flex-grow: 1; /* Input nimmt die ganze Breite */
+    height: 48px; /* gleiche Höhe wie Button */
+    padding: 12px 16px;
+    font-size: 16px;
+  }
 
-.input-row input {
-  flex-grow: 1; /* Input nimmt die ganze Breite */
-  height: 48px; /* gleiche Höhe wie Button */
-  padding: 12px 16px;
-  font-size: 16px;
-}
-
-.input-row button {
-  height: 48px; /* gleiche Höhe wie Input */
-  width: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
+  .input-row button {
+    height: 48px; /* gleiche Höhe wie Input */
+    width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 </style>
 
-<div id="variables" style="display: none;">
-    <div id="chatId">{ChatId}</div>
-    <div id="userName">{userName}</div>
-    <div id="customerName">{customerName}</div>
-    <div id="customerNo">{customerNo}</div>
-    <div id="brand">{brand}</div>
-    <div id="userLanguage">{userLanguage}</div>
-    <div id="initialMessage">{initialMessage}</div>
+<div id="variables" style="display: none">
+  <div id="chatId">{ChatId}</div>
+  <div id="userName">{userName}</div>
+  <div id="customerName">{customerName}</div>
+  <div id="customerNo">{customerNo}</div>
+  <div id="brand">{brand}</div>
+  <div id="userLanguage">{userLanguage}</div>
+  <div id="initialMessage">{initialMessage}</div>
 </div>
 
 <div class="chat-container">
@@ -619,20 +615,24 @@ body.show-welcome .input-container.fixed {
 </div>
 
 <div class="welcome-container" id="welcomeContainer">
+  <!-- Welcome-Screen -->
   <div class="input-container centered">
     <h2>Wie kann ich heute helfen?</h2>
     <div class="input-row">
-      <input type="text" id="messageInput" placeholder="Deine Frage..." />
-      <button id="messageSendButton"><i class="send-icon"></i></button>
+      <input
+        type="text"
+        id="welcomeMessageInput"
+        placeholder="Deine Frage..."
+      />
+      <button id="welcomeSendButton"><i class="send-icon"></i></button>
     </div>
   </div>
 </div>
 
-
-
+<!-- Fixierte Leiste unten -->
 <div class="input-container fixed">
-  <input type="text" id="messageInput" placeholder="Deine Frage..." />
-  <button id="messageSendButton"><i class="send-icon"></i></button>
+  <input type="text" id="chatMessageInput" placeholder="Deine Frage..." />
+  <button id="chatSendButton"><i class="send-icon"></i></button>
 </div>
 
 <div id="linkPopup">
@@ -648,12 +648,16 @@ body.show-welcome .input-container.fixed {
 
   const params = new URLSearchParams(window.location.search);
   const chatId = document.getElementById("chatId").textContent || "chatId";
-  const userName = document.getElementById("userName").textContent || "UserName";
-  const customerName = document.getElementById("customerName").textContent || "CustomerName";
-  const customerNo = document.getElementById("customerNo").textContent || "1000001601";
+  const userName =
+    document.getElementById("userName").textContent || "UserName";
+  const customerName =
+    document.getElementById("customerName").textContent || "CustomerName";
+  const customerNo =
+    document.getElementById("customerNo").textContent || "1000001601";
   const brand = document.getElementById("brand").textContent || "Coop";
 
-  const userLanguage = document.getElementById("userLanguage").textContent || "Deutsch";
+  const userLanguage =
+    document.getElementById("userLanguage").textContent || "Deutsch";
   let defaultInitialMessage = `Was möchtest Du über ${customerName} wissen?`;
   let defaultResponseText = "Danke für Deine Frage.";
   let defaultErrorMessage =
@@ -676,10 +680,14 @@ body.show-welcome .input-container.fixed {
       "C'è stato un problema. Per favore, riprova più tardi.";
   }
 
-  const initialMessage = document.getElementById("initialMessage").textContent || defaultInitialMessage;
+  const initialMessage =
+    document.getElementById("initialMessage").textContent ||
+    defaultInitialMessage;
 
-  const input = document.getElementById("messageInput");
-  const messageSendButton = document.getElementById("messageSendButton");
+  const chatInput = document.getElementById("chatMessageInput");
+  const welcomeInput = document.getElementById("welcomeMessageInput");
+  const chatMessageSendButton = document.getElementById("chatSendButton");
+  const welcomeMessageSendButton = document.getElementById("welcomeSendButton");
 
   async function loadScript(fileName) {
     const response = await fetch(API_URL + `/script/${fileName}`, {
@@ -701,42 +709,41 @@ body.show-welcome .input-container.fixed {
   }
 
   function checkMessages() {
-  const chatMessages = document.getElementById("chatMessages");
-  const welcomeContainer = document.getElementById("welcomeContainer");
-  const inputContainer = document.querySelector(".input-container");
+    const chatMessages = document.getElementById("chatMessages");
+    const welcomeContainer = document.getElementById("welcomeContainer");
+    const inputContainer = document.querySelector(".input-container");
 
-  if (chatMessages.children.length === 0) {
-    // Noch keine Nachrichten => zentriert anzeigen
-    welcomeContainer.style.display = "block";
-    inputContainer.classList.add("centered");
-    inputContainer.classList.remove("fixed");
-    document.body.classList.add("show-welcome");
-  } else {
-    // Nachrichten vorhanden => unten anzeigen
-    welcomeContainer.style.display = "none";
-    inputContainer.classList.remove("centered");
-    inputContainer.classList.add("fixed");
-    document.body.classList.remove("show-welcome");
+    if (chatMessages.children.length === 0) {
+      // Noch keine Nachrichten => zentriert anzeigen
+      welcomeContainer.style.display = "block";
+      inputContainer.classList.add("centered");
+      inputContainer.classList.remove("fixed");
+      document.body.classList.add("show-welcome");
+    } else {
+      // Nachrichten vorhanden => unten anzeigen
+      welcomeContainer.style.display = "none";
+      inputContainer.classList.remove("centered");
+      inputContainer.classList.add("fixed");
+      document.body.classList.remove("show-welcome");
+    }
   }
-}
 
-// Direkt nach dem Laden prüfen
-checkMessages();
+  // Direkt nach dem Laden prüfen
+  checkMessages();
 
-
-  async function sendMessage() {
-    const message = input.value.trim();
-    input.value = "";
-
+  async function sendMessage(inputElement) {
+    const message = inputElement.value.trim();
     if (!message) return;
 
+    inputElement.value = "";
     addMessage(message, false);
     checkMessages();
 
     try {
       createTypingIndicator();
 
-      messageSendButton.disabled = true;
+      chatMessageSendButton.disabled = true;
+      welcomeMessageSendButton.disabled = true;
 
       const response = await fetch(API_URL + "/send", {
         method: "POST",
@@ -772,7 +779,8 @@ checkMessages();
       addMessage(defaultErrorMessage, true);
       checkMessages();
     } finally {
-      messageSendButton.disabled = false;
+      chatMessageSendButton.disabled = false;
+      welcomeMessageSendButton.disabled = false;
     }
   }
 
@@ -805,6 +813,7 @@ checkMessages();
         `;
 
     chatMessages.appendChild(messageDiv);
+    scrollToBottom();
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     return messageDiv;
@@ -850,31 +859,41 @@ checkMessages();
     }
   }
 
-  document
-  .getElementById("chatMessages")
-  .addEventListener("click", function (e) {
-    // Gehe sicher, dass wir den <a>-Tag finden
-    const anchor = e.target.closest("a");
-    if (anchor) {
-      e.preventDefault();
-      const url = anchor.href;
-
-      if (url.includes("trials.bsi-software.com") && !url.includes("bsi-2004.trials.bsi-software.com/i/e/l/quittung")) {
-        // Öffne im Popup
-        const popup = document.getElementById("linkPopup");
-        const iframe = document.getElementById("popupIframe");
-
-        const popupUrl = new URL(url);
-        popupUrl.searchParams.set("customerNo", customerNo); // falls gewünscht
-        iframe.src = popupUrl.toString();
-
-        popup.style.display = "flex";
-      } else {
-        // Öffne alle anderen Links in neuem Tab
-        window.open(url, "_blank");
-      }
-    }
+  function scrollToBottom() {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
   });
+}
+
+  document
+    .getElementById("chatMessages")
+    .addEventListener("click", function (e) {
+      // Gehe sicher, dass wir den <a>-Tag finden
+      const anchor = e.target.closest("a");
+      if (anchor) {
+        e.preventDefault();
+        const url = anchor.href;
+
+        if (
+          url.includes("trials.bsi-software.com") &&
+          !url.includes("bsi-2004.trials.bsi-software.com/i/e/l/quittung")
+        ) {
+          // Öffne im Popup
+          const popup = document.getElementById("linkPopup");
+          const iframe = document.getElementById("popupIframe");
+
+          const popupUrl = new URL(url);
+          popupUrl.searchParams.set("customerNo", customerNo); // falls gewünscht
+          iframe.src = popupUrl.toString();
+
+          popup.style.display = "flex";
+        } else {
+          // Öffne alle anderen Links in neuem Tab
+          window.open(url, "_blank");
+        }
+      }
+    });
 
   document.getElementById("closePopup").addEventListener("click", function () {
     const popup = document.getElementById("linkPopup");
@@ -884,7 +903,7 @@ checkMessages();
   });
 
   await loadScriptMarked();
-
+/*
   document
     .getElementById("messageInput")
     .addEventListener("keydown", function (event) {
@@ -900,16 +919,43 @@ checkMessages();
 
   document
     .getElementById("messageSendButton")
-    .addEventListener("click", sendMessage);
+    .addEventListener("click", sendMessage);*/
+
+
+
+  document.getElementById("welcomeSendButton").addEventListener("click", () => {
+    sendMessage(document.getElementById("welcomeMessageInput"));
+  });
+
+  document.getElementById("chatSendButton").addEventListener("click", () => {
+    sendMessage(document.getElementById("chatMessageInput"));
+  });
+
+  // Enter-Taste abfangen
+  document
+    .getElementById("welcomeMessageInput")
+    .addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage(e.target);
+    });
+
+  document
+    .getElementById("chatMessageInput")
+    .addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage(e.target);
+    });
 
   if (userLanguage === "English") {
-    input.placeholder = `Your question...`;
+    welcomeInput.placeholder = `Your question...`;
+    chatInput.placeholder = `Your question...`;
   } else if (userLanguage === "français") {
-    input.placeholder = `Ta question...`;
+    welcomeInput.placeholder = `Ta question...`;
+    chatInput.placeholder = `Ta question...`;
   } else if (userLanguage === "italiano") {
-    input.placeholder = `La tua domanda...`;
+    welcomeInputinput.placeholder = `La tua domanda...`;
+    chatInput.placeholder = `La tua domanda...`;
   } else {
-    input.placeholder = `Deine Frage...`;
+    welcomeInput.placeholder = `Deine Frage...`;
+    chatInput.placeholder = `Deine Frage...`;
   }
 
   loadHistory();

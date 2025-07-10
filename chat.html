@@ -11,7 +11,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 0;
     overflow: hidden;
@@ -25,11 +24,6 @@
     scrollbar-width: thin;
     scrollbar-color: var(--coop-orange) transparent;
     padding: 20px;
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.1),
-      rgba(255, 255, 255, 0.05)
-    );
   }
 
   .chat-messages::-webkit-scrollbar {
@@ -438,10 +432,6 @@
       background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
     }
 
-    .chat-container {
-      background: rgba(26, 26, 26, 0.95);
-    }
-
     .received {
       background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
       color: #e2e8f0;
@@ -524,7 +514,7 @@
   /* ---------------------------------------------------------- */
   .input-container {
     position: fixed !important; /* fix am Viewport         */
-    bottom: 120px; /* 20 px vom Rand = Float   */
+    bottom: 20px; /* 20 px vom Rand = Float   */
     left: 50%; /* horizontal zentrieren   */
     transform: translateX(-50%); /*  … per Übersetzung      */
 
@@ -598,6 +588,33 @@
     align-items: center;
     justify-content: center;
   }
+
+  .mobile-title {
+  display: none; /* nur Mobile zeigen */
+  text-align: center;
+  font-size: 16px;
+  color: var(--coop-orange);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .mobile-title {
+    display: block;
+  }
+
+  .input-container.fixed {
+    flex-direction: column; /* stapelt Titel und Input */
+    align-items: stretch; /* Titel und Input nehmen volle Breite */
+  }
+
+  .hide-mobile-title {
+    display: none !important;
+  }
+}
+
+
+
 </style>
 
 <div id="variables" style="display: none">
@@ -631,8 +648,11 @@
 
 <!-- Fixierte Leiste unten -->
 <div class="input-container fixed">
-  <input type="text" id="chatMessageInput" placeholder="Deine Frage..." />
-  <button id="chatSendButton"><i class="send-icon"></i></button>
+  <div id="mobileTitle" class="mobile-title">Wie kann ich heute helfen?</div>
+  <div class="input-row">
+    <input type="text" id="chatMessageInput" placeholder="Deine Frage...">
+    <button id="chatSendButton"><i class="send-icon"></i></button>
+  </div>
 </div>
 
 <div id="linkPopup">
@@ -708,25 +728,38 @@
     });
   }
 
-  function checkMessages() {
-    const chatMessages = document.getElementById("chatMessages");
-    const welcomeContainer = document.getElementById("welcomeContainer");
-    const inputContainer = document.querySelector(".input-container");
 
+  function checkMessages() {
+  const chatMessages = document.getElementById("chatMessages");
+  const welcomeContainer = document.getElementById("welcomeContainer");
+  const inputContainer = document.querySelector(".input-container");
+  const mobileTitle = document.getElementById("mobileTitle");
+
+  if (window.innerWidth <= 768) {
+    // Mobile: fixierte Leiste, kein Welcome-Screen
+    welcomeContainer.style.display = "none";
+    document.body.classList.remove("show-welcome");
+
+    // Titel nur anzeigen, wenn noch keine Nachrichten
     if (chatMessages.children.length === 0) {
-      // Noch keine Nachrichten => zentriert anzeigen
-      welcomeContainer.style.display = "block";
-      inputContainer.classList.add("centered");
-      inputContainer.classList.remove("fixed");
-      document.body.classList.add("show-welcome");
+      mobileTitle.classList.remove("hide-mobile-title");
     } else {
-      // Nachrichten vorhanden => unten anzeigen
-      welcomeContainer.style.display = "none";
-      inputContainer.classList.remove("centered");
-      inputContainer.classList.add("fixed");
-      document.body.classList.remove("show-welcome");
+      mobileTitle.classList.add("hide-mobile-title");
     }
+  } else if (chatMessages.children.length === 0) {
+    // Desktop: zentriert, wenn noch keine Nachrichten
+    welcomeContainer.style.display = "block";
+    inputContainer.classList.add("centered");
+    inputContainer.classList.remove("fixed");
+    document.body.classList.add("show-welcome");
+  } else {
+    // Desktop: fixiert, wenn Nachrichten vorhanden
+    welcomeContainer.style.display = "none";
+    inputContainer.classList.remove("centered");
+    inputContainer.classList.add("fixed");
+    document.body.classList.remove("show-welcome");
   }
+}
 
   // Direkt nach dem Laden prüfen
   checkMessages();

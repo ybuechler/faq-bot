@@ -95,7 +95,7 @@
         <img src="https://fooby.ch/etc/designs/fooby/frontend/default/assets/images/logo-header-desktop.svg" alt="Fooby">
       </button>
       <div class="divider"></div>
-      <button class="sub-fan" data-url="https://bsi-2004.trials.bsi-software.com/i/e/l/self-service-portal-portal/de-CH/index">
+      <button class="sub-fan" data-url="https://bsi-2004.trials.bsi-software.com/i/e/l/jumbo-portal">
         <img src="https://www.jumbo.ch/_ui/25.16.0.633/desktop/common/images/logo/logo-jumbo.svg" alt="Jumbo">
       </button>
       <div class="divider"></div>
@@ -125,5 +125,14 @@
       }
     });
   </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const langDropdown = document.getElementById("nav-language-dropdown");
+    if (langDropdown) {
+      langDropdown.style.display = "none";
+    }
+  });
+</script>
 
 

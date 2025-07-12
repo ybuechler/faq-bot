@@ -1,15 +1,15 @@
 # My To-Do List
 
-- [ ] Mehrsprachigkeit
+- [x] Mehrsprachigkeit
 - [x] Sprachenswitch
-- [ ] Format Jumbo
+- [x] Format Jumbo
 - [x] Mobilefähigkeit Chat
 - [x] bot schneller machen
 - [x] Prozess im Chat abarbeiten
-- [ ] Quittungen aufhübschen
+- [x] Quittungen aufhübschen
 - [x] Datenschutz Datei ersetzen
 - [x] Anliegen unterteilen in abgeschlossen und offen
-- [ ] Multiline Chateingabefeld
+- [x] Multiline Chateingabefeld
 
 
 
@@ -36,12 +36,7 @@
     Frage zu Wissensdatenbank
     1) Danke, ich möchte auch noch Käse bestellen. Wie funktioniert das wenn ich online Bestelle, kann ich da auch individuelle Mengen angeben?
 
-    Adressänderung
-    1) Ich bin umgezogen und möchte meine neue Adresse hinterlegene. Ich wohne neu an der Blumenstrasse 15
-    2) in 6343 Rotkreuz
-
 - Zurück zum Dashboard und dann Daten verwalten
-    - Geänderte Adresse zeigen
     - Sprache auf English ändern
 - Kurz Dashboard zeigen
 

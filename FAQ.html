@@ -1,0 +1,305 @@
+<style>
+    #coopContactWidget {
+      --coop-orange: #ff6900;
+      --coop-dark: #333;
+      --coop-light: #fafafa;
+      --coop-border: #e0e0e0;
+      --coop-shadow: rgba(0, 0, 0, 0.397);
+  
+      width: 100%;
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 8px 24px var(--coop-shadow);
+      padding: 2rem;
+      animation: coopFadeIn 0.6s ease;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      color: var(--coop-dark);
+    }
+  
+    @keyframes coopFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  
+    #coopContactWidget .coop-field {
+      margin-bottom: 1.5rem;
+    }
+    #coopContactWidget .coop-field label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      text-align: left; /* linksbündig */
+      color: var(--coop-dark);
+    }
+    #coopContactWidget .coop-field input,
+    #coopContactWidget .coop-field textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--coop-border);
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #coopContactWidget .coop-field input:focus,
+    #coopContactWidget .coop-field textarea:focus {
+      border-color: var(--coop-orange);
+      box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.2);
+      outline: none;
+    }
+  
+    #coopContactWidget .coop-btn {
+      background: var(--coop-orange);
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    #coopContactWidget .coop-btn:hover {
+      background-color: #e55b00;
+      transform: translateY(-1px);
+    }
+    #coopContactWidget .coop-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  
+    #coopContactWidget #results {
+      margin-top: 2rem;
+      display: grid;
+      gap: 1rem;
+    }
+    #coopContactWidget .result-card {
+      background: #fff;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 12px var(--coop-shadow);
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: transform 0.2s ease;
+    }
+    #coopContactWidget .result-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.2rem;
+      color: var(--coop-dark);
+    }
+    #coopContactWidget .result-card h3::before {
+      content: "💡";
+      font-size: 1.2rem;
+    }
+    #coopContactWidget .result-card p {
+      font-size: 1rem;
+      color: #555;
+      line-height: 1.5;
+      text-align: left;
+    }
+    #coopContactWidget .result-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    #coopContactWidget .action-btn {
+      flex: 1;
+      background: #fff;
+      color: #000;
+      border: 1px solid var(--coop-orange);
+      padding: 0.6rem;
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    #coopContactWidget .action-btn:hover {
+        background: var(--coop-orange);
+        color: #fff;
+        border: none;
+    }
+  
+    #coopContactWidget .loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+  
+    #coopContactWidget .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #f3f3f3; /* heller Hintergrund */
+      border-top: 4px solid var(--coop-orange); /* orange Drehung */
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+  
+  <div id="variables" style="display: none">
+    <div id="nameVariable">{name}</div>
+    <div id="emailVariable">{email}</div>
+  </div>
+  
+  <div id="coopContactWidget">
+    <form id="contactForm">
+      <div class="coop-field">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required>
+      </div>
+      <div class="coop-field">
+        <label for="email">E-Mail</label>
+        <input id="email" name="email" type="email" required>
+      </div>
+      <div class="coop-field">
+        <label for="message">Nachricht</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+      </div>
+      <button class="coop-btn" type="submit" id="submitBtn">Abschicken</button>
+    </form>
+  
+    <!-- Treffer werden hier dargestellt -->
+    <div id="results"></div>
+  </div>
+  
+  <script>
+    const API_URL =
+      "https://bsi-2004.trials.bsi-software.com/bsiinterfaces/web-api/17e67ab8-1d28-488e-bed2-77c8d809fc30/knowhow/faq";
+    const API_KEY = "c1f8765d-981a-4c82-941b-002245282f30";
+  
+    const form = document.getElementById("contactForm");
+    const resultsContainer = document.getElementById("results");
+    const submitBtn = document.getElementById("submitBtn");
+  
+    // 🔥 Variablen aus HTML auslesen
+    const varNameElement = document.querySelector("#nameVariable");
+    const varEmailElement = document.querySelector("#emailVariable");
+  
+    if (varNameElement && varEmailElement) {
+      const varName = varNameElement.textContent;
+      const varEmail = varEmailElement.textContent;
+  
+      // In die Formularfelder schreiben
+      const nameInput = document.getElementById("name");
+      const emailInput = document.getElementById("email");
+  
+      if (varName && nameInput) {
+        nameInput.value = varName;
+      }
+      if (varEmail && emailInput) {
+        emailInput.value = varEmail;
+      }
+    }
+  
+    /**
+     * Baut eine Resultat‑Karte
+     * @param {Object} item Ein Know‑how Treffer
+     */
+    function createResultCard(item) {
+      const card = document.createElement("div");
+      card.className = "result-card";
+  
+      const title = document.createElement("h3");
+      title.textContent = item.title;
+      card.appendChild(title);
+  
+      const summary = document.createElement("p");
+      summary.textContent = item.summary;
+      card.appendChild(summary);
+  
+      // Buttons
+      const actions = document.createElement("div");
+      actions.className = "result-actions";
+  
+      const btnHelpful = document.createElement("button");
+      btnHelpful.className = "action-btn";
+      btnHelpful.textContent = "👍 Das hat geholfen";
+  
+      const btnNotHelpful = document.createElement("button");
+      btnNotHelpful.className = "action-btn";
+      btnNotHelpful.textContent = "👎 Das war nicht hilfreich";
+  
+      actions.appendChild(btnHelpful);
+      actions.appendChild(btnNotHelpful);
+      card.appendChild(actions);
+  
+      return card;
+    }
+  
+    /**
+     * Holt Treffer bei Coop Know‑how‑API
+     * @param {string} query Freitextsuche
+     */
+    async function fetchResults(query) {
+      try {
+        const url = `${API_URL}?query=${encodeURIComponent(query)}`;
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "x-api-key": API_KEY,
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error("Fehler beim Abruf der Ergebnisse");
+        }
+  
+        /** @type {Array} */
+        const data = await response.json();
+        return data;
+      } catch (err) {
+        console.error(err);
+        return [];
+      }
+    }
+  
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      resultsContainer.innerHTML = ""; // Alte Ergebnisse leeren
+  
+      // 🔥 Loader einfügen
+      const loader = document.createElement("div");
+      loader.className = "loader";
+      loader.innerHTML = '<div class="spinner"></div>';
+      resultsContainer.appendChild(loader);
+  
+      const message = form.message.value.trim();
+      if (!message) return;
+  
+      const results = await fetchResults(message);
+  
+      // 🧹 Loader entfernen
+      resultsContainer.innerHTML = "";
+  
+      if (results.length === 0) {
+        resultsContainer.innerHTML =
+          "<p>Es wurden keine passenden Einträge gefunden.</p>";
+      } else {
+        results.forEach((item) => {
+          const card = createResultCard(item);
+          resultsContainer.appendChild(card);
+        });
+      }
+  
+      submitBtn.disabled = false;
+    });
+  </script>

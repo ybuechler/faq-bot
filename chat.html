@@ -84,7 +84,7 @@
 
   .message-header-text {
     font-weight: 600;
-    font-size: 13px;
+    font-size: 16px;
     color: var(--coop-orange);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -299,7 +299,7 @@
     margin-bottom: 8px;
     color: var(--coop-orange);
     font-weight: 700;
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .markdown p {
@@ -312,7 +312,7 @@
     padding: 4px 8px;
     border-radius: 6px;
     font-family: "SF Mono", Monaco, monospace;
-    font-size: 13px;
+    font-size: 16px;
     color: var(--coop-orange);
     border: 1px solid rgba(255, 127, 0, 0.1);
   }
@@ -592,7 +592,7 @@
   .mobile-title {
     display: none; /* nur Mobile zeigen */
     text-align: center;
-    font-size: 16px;
+    font-size: 20px;
     color: var(--coop-orange);
     margin-bottom: 8px;
     font-weight: 600;
@@ -620,7 +620,7 @@
     border-radius: 5px;
     background: rgba(255, 255, 255, 0.9);
     color: #333;
-    font-size: 15px;
+    font-size: 16px;
     resize: none; /* verhindert manuelles Vergrößern */
     overflow: hidden; /* Scrollbalken vermeiden */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -643,22 +643,19 @@
   <div id="brand">{brand}</div>
   <div id="userLanguage">{userLanguage}</div>
   <div id="initialMessage">{initialMessage}</div>
+  <div id="sessionID">{sessionID}</div>
 </div>
 
 <div class="chat-container">
   <div class="chat-messages" id="chatMessages"></div>
 </div>
 
-<div class="welcome-container" id="welcomeContainer">
+<div class="welcome-container" id="welcomeContainer" style="display: block;">
   <!-- Welcome-Screen -->
   <div class="input-container centered">
     <h2>Wie kann ich heute helfen?</h2>
     <div class="input-row">
-      <textarea
-        id="welcomeMessageInput"
-        placeholder="Deine Frage..."
-        rows="1"
-      ></textarea>
+      <textarea id="welcomeMessageInput" placeholder="Deine Frage..." rows="1"></textarea>
       <button id="welcomeSendButton"><i class="send-icon"></i></button>
     </div>
   </div>
@@ -668,11 +665,7 @@
 <div class="input-container fixed">
   <div id="mobileTitle" class="mobile-title">Wie kann ich heute helfen?</div>
   <div class="input-row">
-    <textarea
-      id="chatMessageInput"
-      placeholder="Deine Frage..."
-      rows="1"
-    ></textarea>
+    <textarea id="chatMessageInput" placeholder="Deine Frage..." rows="1"></textarea>
     <button id="chatSendButton"><i class="send-icon"></i></button>
   </div>
 </div>
@@ -683,6 +676,9 @@
     <iframe id="popupIframe" src=""></iframe>
   </div>
 </div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 <script type="module">
   const API_URL = "/bsiinterfaces/web-api/l/ai-chat";
@@ -697,6 +693,8 @@
   const customerNo =
     document.getElementById("customerNo").textContent || "1000001601";
   const brand = document.getElementById("brand").textContent || "Coop";
+  const sessionID =
+    document.getElementById("sessionID").textContent || "123";
 
   const userLanguage =
     document.getElementById("userLanguage").textContent || "Deutsch";
@@ -1021,4 +1019,48 @@
     this.style.height = "auto"; // Höhe zurücksetzen
     this.style.height = this.scrollHeight + "px"; // Höhe anpassen
   });
+
+  let toastAlreadyShown = false; // Merker, damit wir nur 1x Toast anzeigen
+
+async function checkApiStatus() {
+  if (toastAlreadyShown) return; // Abbrechen, wenn Toast schon gezeigt wurde
+
+  try {
+    const response = await fetch("https://bsi-2004.trials.bsi-software.com/i/e/l/self-service-portal-rest?sessionId=" + sessionID);
+    if (!response.ok) {
+      console.error("API Fehler:", response.status);
+      return;
+    }
+
+    const data = await response.json();
+
+    console.log("API Antwort:", data);
+
+    if (data.status === "done") {
+      // Toast nur beim ersten "done" anzeigen
+      Toastify({
+        text: "📫 Dein Anliegen zum Speichenreflektor wurde bearbeitet.",
+        duration: 5000,
+        gravity: "top", // top oder bottom
+        position: "right", // left, center oder right
+        stopOnFocus: true,
+        destination: "https://bsi-2004.trials.bsi-software.com/i/e/l/self-service-portal-portal/de-CH/meine-cases",
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+      }).showToast();
+
+      toastAlreadyShown = true; // Merker setzen
+    }
+  } catch (err) {
+    console.error("Fehler beim API-Aufruf:", err);
+  }
+}
+
+// Alle 5 Sekunden die API prüfen
+setInterval(checkApiStatus, 5000);
+
+// Optional: Direkt beim Start einmal prüfen
+checkApiStatus();
+
 </script>
